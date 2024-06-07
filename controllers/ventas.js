@@ -11,16 +11,21 @@ const httpVentas = {
         res.json({ venta });
     },
     postVentas: async (req, res) => {
-        const { fecha, codigoProducto, valorUnitario, cantidad, valorTotal } = req.body;
-        const venta = new Venta({
-            fecha,
-            codigoProducto,
-            valorUnitario,
-            cantidad,
-            valorTotal,
-        });
-        await venta.save();
-        res.json({ venta });
+        try {
+            const { fecha, codigoProducto, valorUnitario, cantidad, valorTotal } = req.body;
+            const venta = new Venta({
+                fecha,
+                codigoProducto,
+                valorUnitario,
+                cantidad,
+                valorTotal,
+            });
+            await venta.save();
+            res.json({ venta });
+        } catch (error) {
+            console.log(error.message);
+            res.status(400).json({ error: `No se pudo crear la venta ${error.message}` });
+        }
     },
     putVentas: async (req, res) => {
         const { id } = req.params;
@@ -35,8 +40,8 @@ const httpVentas = {
             if (valorTotal !== undefined) updateData.valorTotal = valorTotal;
 
             const ventaActualizada = await Venta.findByIdAndUpdate(
-                id, 
-                updateData, 
+                id,
+                updateData,
                 { new: true }
             );
 

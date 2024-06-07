@@ -10,7 +10,7 @@ const mantenimientoSchema = new mongoose.Schema({
     descripcion: { type: String },
     responsable: { type: String, required: true },
     precio: { type: Number },
-    estado: { type: Number, default: 1 },
+    estado: { type: Number },
 });
 
 export default mongoose.model("Mantenimiento", mantenimientoSchema);

@@ -34,34 +34,52 @@ const httpPagos = {
         res.json({ clienteN });
     },
     postPagos: async (req, res) => {
-        const { cliente, plan, fecha, valor, estado } = req.body; //el cliente es el id del cliente
-        const pagos = new Pago({ cliente, plan, fecha, valor, estado });
-        await pagos.save();
-        res.json({ pagos });
-    },
+        try {
+            const { cliente, plan, fecha, valor, estado } = req.body; //el cliente es el id del cliente
+            const pagos = new Pago({ cliente, plan, fecha, valor, estado });
+            await pagos.save();
+            res.json({ pagos });
+        } catch (error) {
+            console.error("Error al agregar el pago:", error);
+            res.status(500).json({ error: `Error al agregar el pago ${error}` });
+        }
+    },    
     putPagos: async (req, res) => {
         const { id } = req.params;
         const { cliente, plan, fecha, valor } = req.body;
         try {
-            let updateField;
+            // // Verificar si el pago con el ID proporcionado existe
+            // const pagoExistente = await Pago.findById(id);
+            // if (!pagoExistente) {
+            //     return res.status(404).json({ error: "ID del Pago no encontrado" });
+            // }
+    
+            // Actualizar solo los campos proporcionados
+            const updateFields = {};
             if (cliente !== undefined) {
-                updateField = { cliente };
-            } else if (plan !== undefined) {
-                updateField = { plan };
-            } else if (fecha !== undefined) {
-                updateField = { fecha };
-            } else if (valor !== undefined) {
-                updateField = { valor };
-            } else {
-                return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });
+                updateFields.cliente = cliente;
+            }
+            if (plan !== undefined) {
+                updateFields.plan = plan;
+            }
+            if (fecha !== undefined) {
+                updateFields.fecha = fecha;
+            }
+            if (valor !== undefined) {
+                updateFields.valor = valor;
             }
     
-            const updatedPago = await Pago.findByIdAndUpdate(id, updateField, { new: true });
+            // Realizar la actualización en la base de datos
+            const updatedPago = await Pago.findByIdAndUpdate(id, updateFields, { new: true });
+    
+            // Devolver el pago actualizado como respuesta
             res.json({ pago: updatedPago });
         } catch (error) {
-            res.status(500).json({ error: "ID del Pago no encontrado" });
+            // Manejar errores de forma adecuada
+            console.error(error);
+            res.status(500).json({ error: `Error al actualizar el pago ${error.message}` });
         }
-    },
+    },    
     putPagosActivar: async (req, res) => {
         const { id } = req.params; //el id es del id
         const pagos = await Pago.findByIdAndUpdate(

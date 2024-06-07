@@ -68,7 +68,8 @@ const httpUsuarios = {
 		}
 	},
 	postUsuarios: async (req, res) => {
-		const { sede, nombre, email, telefono, password, rol, estado } =
+		try {
+					const { sede, nombre, email, telefono, password, rol, estado } =
 			req.body;
 		const usuario = new Usuario({
 			sede,
@@ -85,62 +86,41 @@ const httpUsuarios = {
 		res.json({
 			usuario
 		});
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json({
+				msg: 'Error.', error
+			});
+		}
 	},
 	putUsuarios: async (req, res) => {
 		const { id } = req.params;
 		const { sede, nombre, email, telefono, password, rol } = req.body;
-		try {
 
-			if (sede != undefined) {
-				const usuarioS = await Usuario.findByIdAndUpdate(
-					id,
-					{ sede },
-					{ new: true }
-				);
-				res.json({ usuarioS })
-			} else if (nombre != undefined) {
-				const usuarioN = await Usuario.findByIdAndUpdate(
-					id,
-					{ nombre },
-					{ new: true }
-				);
-				res.json({ usuarioN });
-			} else if (email != undefined) {
-				const usuarioE = await Usuario.findByIdAndUpdate(
-					id,
-					{ email },
-					{ new: true }
-				);
-				res.json({ usuarioE });
-			} else if (telefono != undefined) {
-				const usuarioT = await Usuario.findByIdAndUpdate(
-					id,
-					{ telefono },
-					{ new: true }
-				);
-				res.json({ usuarioT });
-			} else if (password != undefined) {
-				const usuarioP = await Usuario.findByIdAndUpdate(
-					id,
-					{ password },
-					{ new: true }
-				);
-				res.json({ usuarioP });
-			} else if (rol != undefined) {
-				const usuarioR = await Usuario.findByIdAndUpdate(
-					id,
-					{ rol },
-					{ new: true }
-				);
-				res.json({ usuarioR });
-			} else {
-				res
-					.status(200)
-					.json({ error: "Ningún campo proporcionado para actualizar." });
+		try {
+			const updateFields = {};
+
+			if (sede !== undefined) updateFields.sede = sede;
+			if (nombre !== undefined) updateFields.nombre = nombre;
+			if (email !== undefined) updateFields.email = email;
+			if (telefono !== undefined) updateFields.telefono = telefono;
+			if (rol !== undefined) updateFields.rol = rol;
+
+			if (password !== undefined) {
+				const salt = bcryptjs.genSaltSync();
+				updateFields.password = bcryptjs.hashSync(password, salt);
 			}
 
+			const usuario = await Usuario.findByIdAndUpdate(id, updateFields, { new: true });
+
+			if (!usuario) {
+				return res.status(404).json({ error: "ID del usuario no encontrado" });
+			}
+
+			return res.json({ usuario });
+
 		} catch (error) {
-			return res.status(404).json({ error: "ID del usuario no encontrado" });
+			return res.status(500).json({ error: "Error al actualizar el usuario" });
 		}
 	},
 	putUsuariosActivar: async (req, res) => {

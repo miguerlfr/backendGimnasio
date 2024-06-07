@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import httpIngresos from '../controllers/ingresos.js';
 import { check } from 'express-validator';
-import helpersIngresos from '../helpers/ingresos.js';
+// import helpersIngresos from '../helpers/ingresos.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
 // import { validarJWT } from '../middlewares/validar-jwt.js';
 

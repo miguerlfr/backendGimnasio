@@ -1,7 +1,7 @@
 import { Router } from "express";
 import httpPagos from "../controllers/pagos.js";
 import { check } from "express-validator";
-import helpersPagos from '../helpers/pagos.js';
+// import helpersPagos from '../helpers/pagos.js';
 import { validarCampos } from "../middlewares/validar-campos.js";
 // import { validarJWT } from "../middlewares/validar-jwt.js";
 

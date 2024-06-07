@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import httpVentas from '../controllers/ventas.js';
 import { check } from 'express-validator';
-import helpersVentas from '../helpers/ventas.js';
+// import helpersVentas from '../helpers/ventas.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
 // import { validarJWT } from '../middlewares/validar-jwt.js';
 
