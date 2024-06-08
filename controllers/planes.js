@@ -31,47 +31,20 @@ const httpPlanes = {
         planes.valor = valorFormateado;
         res.json({ planes });
     },
-    putPlanes: async (req, res) => {
-        const { id } = req.params;
-        const { codigo, descripcion, valor, dias } = req.body;
-        try {
-            if (codigo != undefined) {
-                const planesC = await Plane.findByIdAndUpdate(
-                    id,
-                    { codigo },
-                    { new: true }
-                );
-                res.json({ planesC });
-            } else if (descripcion != undefined) {
-                const planesD = await Plane.findByIdAndUpdate(
-                    id,
-                    { descripcion },
-                    { new: true }
-                );
-                res.json({ planesD });
-            } else if (valor != undefined) {
-                const planesV = await Plane.findByIdAndUpdate(
-                    id,
-                    { valor },
-                    { new: true }
-                );
-                res.json({ planesV });
-            } else if (dias != undefined) {
-                const planesD = await Plane.findByIdAndUpdate(
-                    id,
-                    { dias },
-                    { new: true }
-                );
-                res.json({ planesD });
-            } else {
-                res
-                    .status(200)
-                    .json({ error: "Ningún campo proporcionado para actualizar." });
-            }
-        } catch (error) {
-            return res.status(404).json({ error: "ID de Plan no encontrado" });
-        }
-    },
+putPlanes: async (req, res) => {
+    const { id } = req.params;
+    const { codigo, descripcion, valor, dias } = req.body;
+    try {
+        const updatedPlan = await Plane.findByIdAndUpdate(
+            id,
+            { codigo, descripcion, valor, dias }, // Actualizar todos los campos del plan
+            { new: true }
+        );
+        res.json({ plan: updatedPlan });
+    } catch (error) {
+        return res.status(404).json({ error: "ID de Plan no encontrado" });
+    }
+},
     putPlanesActivar: async (req, res) => {
         const { id } = req.params;
         const planes = await Plane.findByIdAndUpdate(

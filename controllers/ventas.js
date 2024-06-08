@@ -51,7 +51,7 @@ const httpVentas = {
 
             res.json({ venta: ventaActualizada });
         } catch (error) {
-            res.status(500).json({ error: "Ningún campo proporcionado para actualizar" });
+            res.status(500).json({ error: "Ningún campo proporcionado para actualizar", error });
         }
     },
 };
