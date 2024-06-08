@@ -19,6 +19,7 @@ import productos from './routes/productos.js'; // Cambio aquí
 const app = express();
 
 app.use(express.json());
+app.use(express.static('public'))
 app.use(cors())
 
 app.use('/api/clientes', clientes);
