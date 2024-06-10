@@ -11,29 +11,29 @@ const planSchema = new mongoose.Schema({
 export default mongoose.model("Plane", planSchema);
 
 // {
-//     "codigo": "Plan normal",
-//     "descripcion": "Plan normal de un 1 día",
+//     "codigo": "Plan01",
+//     "descripcion": "Plan normal (1 día)",
 //     "valor": 5000,
 //     "dias": 1
 // }
 
 // {
-//     "codigo": "Plan básico",
-//     "descripcion": "Plan básico de un 1 mes",
+//     "codigo": "Plan02",
+//     "descripcion": "Plan básico (1 mes)",
 //     "valor": 100000,
 //     "dias": 30
 // }
 
 // {
-//     "codigo": "Plan medio",
-//     "descripcion": "Plan medio de un 3 mes",
+//     "codigo": "Plan03",
+//     "descripcion": "Plan medio (3 meses)",
 //     "valor": 250000,
 //     "dias": 90
 // }
 
 // {
-//     "codigo": "Plan avanzado",
-//     "descripcion": "Plan avanzado de un 12 mes",
+//     "codigo": "Plan03",
+//     "descripcion": "Plan avanzado (12 mes)",
 //     "valor": 1200000,
 //     "dias": 365
 // }

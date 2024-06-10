@@ -2,7 +2,11 @@ import mongoose from 'mongoose';
 
 const maquinaSchema = new mongoose.Schema({
     codigo: { type: String, required: true },
-    sede: { type: String, required: true },
+    sede: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Sede",
+        required: true,
+    },
     descripcion: { type: String },
     fechaIngreso: { type: Date, required: true },
     fechaUltMan: { type: Date },

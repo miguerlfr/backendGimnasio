@@ -36,50 +36,33 @@ const httpMaquinas = {
         const { id } = req.params;
         const { codigo, sede, descripcion, fechaIngreso, fechaUltMan } = req.body;
         try {
-            if (codigo != undefined) {
-                const maquinaC = await Maquina.findByIdAndUpdate(
-                    id,
-                    { codigo },
-                    { new: true }
-                );
-                res.json({ maquinaC });
-            } else if (sede != undefined) {
-                const maquinaS = await Maquina.findByIdAndUpdate(
-                    id,
-                    { sede },
-                    { new: true }
-                );
-                res.json({ maquinaS });
-            } else if (descripcion != undefined) {
-                const maquinaD = await Maquina.findByIdAndUpdate(
-                    id,
-                    { descripcion },
-                    { new: true }
-                );
-                res.json({ maquinaD });
-            } else if (fechaIngreso != undefined) {
-                const maquinaFI = await Maquina.findByIdAndUpdate(
-                    id,
-                    { fechaIngreso },
-                    { new: true }
-                );
-                res.json({ maquinaFI });
-            } else if (fechaUltMan != undefined) {
-                const maquinaFUM = await Maquina.findByIdAndUpdate(
-                    id,
-                    { fechaUltMan },
-                    { new: true }
-                );
-                res.json({ maquinaFUM });
-            } else {
-                res
-                    .status(200)
-                    .json({ error: "Ningún campo proporcionado para actualizar." });
+            const updateFields = {};
+    
+            if (codigo !== undefined) updateFields.codigo = codigo;
+            if (sede !== undefined) updateFields.sede = sede;
+            if (descripcion !== undefined) updateFields.descripcion = descripcion;
+            if (fechaIngreso !== undefined) updateFields.fechaIngreso = fechaIngreso;
+            if (fechaUltMan !== undefined) updateFields.fechaUltMan = fechaUltMan;
+    
+            if (Object.keys(updateFields).length === 0) {
+                return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });
             }
+    
+            const maquinaActualizada = await Maquina.findByIdAndUpdate(
+                id,
+                updateFields,
+                { new: true }
+            );
+    
+            if (!maquinaActualizada) {
+                return res.status(404).json({ error: "ID de la Máquina no encontrado" });
+            }
+    
+            res.json({ maquinaActualizada });
         } catch (error) {
-            res.status(500).json({ error: "ID de la Máquina no encontrado" });
+            res.status(500).json({ error: "Error al actualizar la máquina" });
         }
-    },
+    },    
     putMaquinasActivar: async (req, res) => {
         const { id } = req.params;
         const maquinas = await Maquina.findByIdAndUpdate(

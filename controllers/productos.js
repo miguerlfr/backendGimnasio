@@ -31,46 +31,34 @@ const httpProductos = {
     putProductos: async (req, res) => {
         const { id } = req.params;
         const { codigo, descripcion, valor, cantidad } = req.body;
+      
         try {
-
-            if (codigo != undefined) {
-                const invetariosC = await Producto.findByIdAndUpdate(
-                    id,
-                    { codigo },
-                    { new: true }
-                );
-                res.json({ invetariosC });
-            } else if (descripcion != undefined) {
-                const invetariosD = await Producto.findByIdAndUpdate(
-                    id,
-                    { descripcion },
-                    { new: true }
-                );
-                res.json({ invetariosD });
-            } else if (valor != undefined) {
-                const invetariosV = await Producto.findByIdAndUpdate(
-                    id,
-                    { valor },
-                    { new: true }
-                );
-                res.json({ invetariosV });
-            } else if (cantidad != undefined) {
-                const invetariosCa = await Producto.findByIdAndUpdate(
-                    id,
-                    { cantidad },
-                    { new: true }
-                );
-                res.json({ invetariosCa });
-            } else {
-                res
-                    .status(200)
-                    .json({ error: "Ningún campo proporcionado para actualizar." });
-            }
-
-        } catch (error) {
+          const updateFields = {};
+      
+          if (codigo !== undefined) updateFields.codigo = codigo;
+          if (descripcion !== undefined) updateFields.descripcion = descripcion;
+          if (valor !== undefined) updateFields.valor = valor;
+          if (cantidad !== undefined) updateFields.cantidad = cantidad;
+      
+          if (Object.keys(updateFields).length === 0) {
+            return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });
+          }
+      
+          const productoActualizado = await Producto.findByIdAndUpdate(
+            id,
+            updateFields,
+            { new: true }
+          );
+      
+          if (!productoActualizado) {
             return res.status(404).json({ error: "ID del Producto no encontrado" });
+          }
+      
+          res.json({ productoActualizado });
+        } catch (error) {
+          res.status(500).json({ error: "Error al actualizar el producto" });
         }
-    },
+      }      
 };
 
 export default httpProductos
