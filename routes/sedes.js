@@ -2,14 +2,14 @@ import { Router } from "express";
 import httpSedes from "../controllers/sedes.js";
 import { check } from "express-validator";
 import { validarCampos } from "../middlewares/validar-campos.js";
-// import { validarJWT } from '../middlewares/validar-jwt.js';
+import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
 
 router.get("/",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.getSedes
 );
@@ -17,7 +17,7 @@ router.get("/",
 router.get("/activos",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.getSedesActivos
 );
@@ -25,7 +25,7 @@ router.get("/activos",
 router.get("/inactivos",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.getSedesInactivos
 );
@@ -34,7 +34,7 @@ router.get("/:id",
   [
     check("id", "Se necesita un mongoId válido").isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.getSedesID
 );
@@ -46,7 +46,7 @@ router.post("/",
     // check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isMobilePhone("any", { strictMode: false }),
     // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.postSedes
 );
@@ -57,7 +57,7 @@ router.put("/:id",
     // check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isMobilePhone("any", { strictMode: false }),
     // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.putSedes
 );
@@ -66,7 +66,7 @@ router.put("/activar/:id",
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.putSedesActivar
 );
@@ -75,7 +75,7 @@ router.put("/inactivar/:id",
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpSedes.putSedesInactivar
 );
