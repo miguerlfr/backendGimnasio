@@ -2,7 +2,7 @@ import Mantenimiento from "../models/mantenimientos.js";
 
 const httpMantenimientos = {
     getMantenimientos: async (req, res) => {
-        const mantenimientos = await Mantenimiento.find();
+        const mantenimientos = await Mantenimiento.find().populate('idMaquina', 'descripcion');
         res.json({ mantenimientos });
     },
     getMantenimientosFechas: async (req, res) => {
@@ -16,7 +16,7 @@ const httpMantenimientos = {
             // Obtener los mantenimientos dentro del rango de fechas
             const mantenimientos = await Mantenimiento.find({
                 fecha: { $gte: fechaInicioObj, $lte: fechaFinObj },
-            });
+            }).populate('idMaquina', 'descripcion');
 
             // Enviar la respuesta con los mantenimientos encontrados
             res.json({ mantenimientos });
@@ -29,7 +29,7 @@ const httpMantenimientos = {
     },
     getMantenimientosID: async (req, res) => {
         const { id } = req.params;
-        const mantenimiento = await Mantenimiento.findById(id);
+        const mantenimiento = await Mantenimiento.findById(id).populate('idMaquina', 'descripcion');
         res.json({ mantenimiento });
     },
     postMantenimientos: async (req, res) => {

@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 
 const usuarioSchema = new mongoose.Schema({
-    sede: { type: String, required: true },
+    sede: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Sede",
+        required: true,
+    },
     nombre: { type: String, required: true },
     email: { type: String, required: true },
     telefono: { type: Number },

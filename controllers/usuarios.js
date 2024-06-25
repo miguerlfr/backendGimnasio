@@ -4,20 +4,20 @@ import { generarJWT } from '../middlewares/validar-jwt.js'
 
 const httpUsuarios = {
 	getUsuarios: async (req, res) => {
-		const usuarios = await Usuario.find();
+		const usuarios = await Usuario.find().populate('sede', 'nombre');
 		res.json({ usuarios });
 	},
 	getUsuariosActivos: async (req, res) => {
-		const usuariosAc = await Usuario.find({ estado: 1 });
+		const usuariosAc = await Usuario.find({ estado: 1 }).populate('sede', 'nombre');
 		res.json({ usuariosAc });
 	},
 	getUsuariosInactivos: async (req, res) => {
-		const usuariosIn = await Usuario.find({ estado: 0 });
+		const usuariosIn = await Usuario.find({ estado: 0 }).populate('sede', 'nombre');
 		res.json({ usuariosIn });
 	},
 	getUsuariosID: async (req, res) => {
 		const { id } = req.params;
-		const usuario = await Usuario.findById(id);
+		const usuario = await Usuario.findById(id).populate('sede', 'nombre');
 		res.json({ usuario })
 	},
 	postUsuariosLogin: async (req, res) => {

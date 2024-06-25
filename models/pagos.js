@@ -6,7 +6,11 @@ const pagoSchema = new mongoose.Schema({
         ref: "Cliente",
         required: true,
     },
-    plan: { type: String, required: true },
+    plan: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Plane",
+        required: true,
+    },
     fecha: { type: Date, required: true },
     valor: { type: Number, required: true },
     estado: { type: Number, default: 1 },

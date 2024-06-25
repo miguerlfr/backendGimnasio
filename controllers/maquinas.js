@@ -2,20 +2,20 @@ import Maquina from '../models/maquinas.js';
 
 const httpMaquinas = {
     getMaquinas: async (req, res) => {
-        const maquinas = await Maquina.find();
+        const maquinas = await Maquina.find().populate('sede', 'nombre');
         res.json({ maquinas });
     },
     getMaquinasActivos: async (req, res) => {
-        const maquinasAc = await Maquina.find({ estado: 1 });
+        const maquinasAc = await Maquina.find({ estado: 1 }).populate('sede', 'nombre');
         res.json({ maquinasAc });
     },
     getMaquinasInactivos: async (req, res) => {
-        const maquinasIn = await Maquina.find({ estado: 0 });
+        const maquinasIn = await Maquina.find({ estado: 0 }).populate('sede', 'nombre');
         res.json({ maquinasIn });
     },
     getMaquinasID: async (req, res) => {
         const { id } = req.params;
-        const maquina = await Maquina.findById(id);
+        const maquina = await Maquina.findById(id).populate('sede', 'nombre');
         res.json({ maquina });
     },
     postMaquinas: async (req, res) => {

@@ -2,47 +2,46 @@ import Cliente from "../models/clientes.js";
 
 const httpClientes = {
     getClientes: async (req, res) => {
-        const clientes = await Cliente.find();
+        const clientes = await Cliente.find().populate('plan', 'descripcion');
         res.json({ clientes });
     },
     getClientesActivos: async (req, res) => {
-        const clientesAc = await Cliente.find({ estado: 1 });
+        const clientesAc = await Cliente.find({ estado: 1 }).populate('plan', 'descripcion');
         res.json({ clientesAc });
     },
     getClientesInactivos: async (req, res) => {
-        const clientesIn = await Cliente.find({ estado: 0 });
+        const clientesIn = await Cliente.find({ estado: 0 }).populate('plan', 'descripcion');
         res.json({ clientesIn });
     },
     getClientesID: async (req, res) => {
         const { id } = req.params;
-        const clientes = await Cliente.findById(id);
+        const clientes = await Cliente.findById(id).populate('plan', 'descripcion');;
         res.json({ clientes });
     },
     getClientesSeguimiento: async (req, res) => {
         const { id } = req.params;
-        const clientesS = await Cliente.findById(id).select("seguimiento");
+        const clientesS = await Cliente.findById(id).select("seguimiento").populate('plan', 'descripcion');;
         res.json({ clientesS });
     },
     getClientesPlan: async (req, res) => {
         try {
             const { plan } = req.params;
             const clientesC = await Cliente.countDocuments({ plan });
-            const clientesP = await Cliente.find({ plan }); // Fetch clients matching the plan
+            const clientesP = await Cliente.find({ plan }).populate('plan', 'descripcion');
             res.json({ clientesC, clientesP });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ error: "Error al obtener los clientes por plan" });
         }
     },
-
     getClientesCumpleaños: async (req, res) => {
         const { fecha } = req.params;
-        const clientesC = await Cliente.filter({ fechaNacimiento: new Date(fecha) });
+        const clientesC = await Cliente.filter({ fechaNacimiento: new Date(fecha) }).populate('plan', 'descripcion');
         res.json({ clientesC });
     },
     getClientesIngresaron: async (req, res) => {
         const { fecha } = req.params;
-        const clientesIngresaron = await Cliente.find({ fechaIngreso: new Date(fecha) });
+        const clientesIngresaron = await Cliente.find({ fechaIngreso: new Date(fecha) }).populate('plan', 'descripcion');;
         const clientesCantidad = await Cliente.countDocuments({
             fechaIngreso: new Date(fecha),
         });
@@ -69,54 +68,58 @@ const httpClientes = {
     //   },
     postClientes: async (req, res) => {
         try {
-            const {
-                nombre,
-                fechaIngreso,
-                documento,
-                fechaNacimiento,
-                edad,
-                direccion,
-                telefono,
-                objetivo,
-                observaciones,
-                estado,
-                plan,
-                fechaVencimiento,
-                seguimiento
-            } = req.body;
-
-            // Parsear las fechas
-            const fechaIngresoParsed = new Date(fechaIngreso);
-            const fechaNacimientoParsed = new Date(fechaNacimiento);
-            const fechaVencimientoParsed = new Date(fechaVencimiento);
-
-            // Crear un nuevo cliente con las fechas parseadas
-            const cliente = new Cliente({
-                nombre,
-                fechaIngreso: fechaIngresoParsed,
-                documento,
-                fechaNacimiento: fechaNacimientoParsed,
-                edad,
-                direccion,
-                telefono,
-                objetivo,
-                observaciones,
-                estado,
-                plan,
-                fechaVencimiento: fechaVencimientoParsed,
-                seguimiento
-            });
-
-            // Guardar el cliente en la base de datos
-            await cliente.save();
-
-            // Enviar respuesta con el cliente creado
-            res.json({ cliente });
+          console.log("req.body:", req.body);
+          const {
+            nombre,
+            fechaIngreso,
+            documento,
+            fechaNacimiento,
+            edad,
+            direccion,
+            telefono,
+            objetivo,
+            observaciones,
+            estado,
+            plan,
+            fechaVencimiento,
+            seguimiento
+          } = req.body;
+      
+          console.log("seguimiento:", seguimiento);
+      
+          // Parsear las fechas
+          const fechaIngresoParsed = new Date(fechaIngreso);
+          const fechaNacimientoParsed = new Date(fechaNacimiento);
+          const fechaVencimientoParsed = new Date(fechaVencimiento);
+      
+          // Crear un nuevo cliente con las fechas parseadas
+          const cliente = new Cliente({
+            nombre,
+            fechaIngreso: fechaIngresoParsed,
+            documento,
+            fechaNacimiento: fechaNacimientoParsed,
+            edad,
+            direccion,
+            telefono,
+            objetivo,
+            observaciones,
+            estado,
+            plan,
+            fechaVencimiento: fechaVencimientoParsed,
+            seguimiento
+          });
+      
+          // Guardar el cliente en la base de datos
+          await cliente.save();
+      
+          // Enviar respuesta con el cliente creado
+          res.json({ cliente });
         } catch (error) {
-            // Manejar errores
-            res.status(400).json({ error: `No se pudo crear el cliente ${error.message}` });
+          // Manejar errores
+          console.log("error:", error);
+          res.status(400).json({ error: `No se pudo crear el cliente ${error.message}` });
         }
-    },
+      },
     putClientes: async (req, res) => {
         const { id } = req.params;
         const {

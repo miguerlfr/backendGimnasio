@@ -11,7 +11,11 @@ const clienteSchema = new mongoose.Schema({
     objetivo: { type: String, required: true },
     observaciones: { type: String },
     estado: { type: Number, default: 1 },
-    plan: { type: String, required: true },
+    plan: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Plane",
+        required: true,
+    },
     fechaVencimiento: { type: Date, required: true },
     /* foto */
     seguimiento: [
@@ -24,7 +28,7 @@ const clienteSchema = new mongoose.Schema({
             cintura: { type: Number },
             estatura: { type: Number },
         },
-    ],
+    ]
 });
 
 export default mongoose.model("Cliente", clienteSchema);
@@ -41,6 +45,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //     "telefono": 3216549870,
 //     "objetivo": "Tonificar el cuerpo",
 //     "observaciones": "Utilizar mas peso al levantar pierna",
+//     "estado": 1,
 //     "plan": "Plan básico",
 //     "fechaVencimiento": "2024-05-15T00:00:00.000Z",
 //     "seguimiento": [
@@ -66,6 +71,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //     "telefono": 4567891230,
 //     "objetivo": "Mejorar resistencia",
 //     "observaciones": "Hacer más cardio",
+//     "estado": 1,
 //     "plan": "Plan medio",
 //     "fechaVencimiento": "2024-07-25T00:00:00.000Z",
 //     "seguimiento": [
@@ -91,6 +97,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //     "telefono": 7891234560,
 //     "objetivo": "Mantener la forma física",
 //     "observaciones": "Hacer cardio despues de entrenar",
+//     "estado": 1,
 //     "plan": "Plan avanzado",
 //     "fechaVencimiento": "2025-04-20T00:00:00.000Z",
 //     "seguimiento": [
@@ -116,6 +123,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //     "telefono": 9876543210,
 //     "objetivo": "Ganar masa muscular",
 //     "observaciones": "Comer mas grasas",
+//     "estado": 1,
 //     "plan": "Plan avanzado",
 //     "fechaVencimiento": "2025-04-28T00:00:00.000Z",
 //     "seguimiento": [
@@ -141,6 +149,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //     "telefono": 1234567890,
 //     "objetivo": "Perder peso",
 //     "observaciones": "Utilizar menos peso",
+//     "estado": 1,
 //     "plan": "Plan básico",
 //     "fechaVencimiento": "2024-05-30T00:00:00.000Z",
 //     "seguimiento": [

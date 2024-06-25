@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 
 const ventaSchema = new mongoose.Schema({
     fecha: { type: Date },
-    codigoProducto: { type: String, required: true },
+    codigoProducto: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Producto",
+        required: true,
+    },
     valorUnitario: { type: Number, required: true },
     cantidad: { type: Number, required: true },
     valorTotal: { type: Number, required: true },

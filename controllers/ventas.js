@@ -2,12 +2,12 @@ import Venta from '../models/ventas.js';
 
 const httpVentas = {
     getVentas: async (req, res) => {
-        const ventas = await Venta.find();
+        const ventas = await Venta.find().populate('codigoProducto', 'descripcion');
         res.json({ ventas });
     },
     getVentasID: async (req, res) => {
         const { id } = req.params;
-        const venta = await Venta.findById(id);
+        const venta = await Venta.findById(id).populate('codigoProducto', 'descripcion');
         res.json({ venta });
     },
     postVentas: async (req, res) => {

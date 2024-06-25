@@ -1,12 +1,9 @@
 import Ingreso from '../models/ingresos.js';
-import { parse } from 'date-fns';
-
-const formatDateForDB = (dateString) => parse(dateString, 'dd/MM/yyyy', new Date());
 
 const httpIngresos = {
     getIngresos: async (req, res) => {
         try {
-            const ingresos = await Ingreso.find();
+            const ingresos = await Ingreso.find().populate('sede', 'nombre').populate('cliente', 'nombre'); 
             res.json({ ingresos });
         } catch (error) {
             res.status(500).json({ error: "Error al obtener los ingresos" });
@@ -15,7 +12,7 @@ const httpIngresos = {
     getIngresosID: async (req, res) => {
         try {
             const { id } = req.params;
-            const ingreso = await Ingreso.findById(id);
+            const ingreso = await Ingreso.findById(id).populate('sede', 'nombre').populate('cliente', 'nombre');
             if (!ingreso) {
                 return res.status(404).json({ error: "Ingreso no encontrado" });
             }
@@ -27,13 +24,13 @@ const httpIngresos = {
     postIngresos: async (req, res) => {
         try {
             const { fecha, sede, cliente } = req.body;
-            
+
             // Si cliente no es una matriz, envolverlo en una matriz
             const clientes = Array.isArray(cliente) ? cliente : [cliente];
-            
+
             // Parsear la fecha
             const fechaParsed = new Date(fecha);
-            
+
             // Guardar múltiples ingresos para el mismo cliente
             const ingresos = await Promise.all(clientes.map(async (clienteId) => {
                 const ingreso = new Ingreso({
@@ -44,7 +41,7 @@ const httpIngresos = {
                 await ingreso.save();
                 return ingreso;
             }));
-            
+
             // Enviar respuesta con los ingresos creados
             res.json({ ingresos });
         } catch (error) {
@@ -52,7 +49,7 @@ const httpIngresos = {
             res.status(500).json({ error: `Error al crear los ingresos: ${error.message}` });
         }
     },
-     
+
     putIngresos: async (req, res) => {
         try {
             const { id } = req.params;
