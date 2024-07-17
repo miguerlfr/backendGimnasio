@@ -1,16 +1,16 @@
 import { Router } from "express";
 import httpPagos from "../controllers/pagos.js";
 import { check } from "express-validator";
-// import helpersPagos from '../helpers/pagos.js';
+import helpersPagos from '../helpers/pagos.js';
 import { validarCampos } from "../middlewares/validar-campos.js";
-// import { validarJWT } from "../middlewares/validar-jwt.js";
+import { validarJWT } from "../middlewares/validar-jwt.js";
 
 const router = Router();
 
 router.get("/",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.getPagos
 );
@@ -18,7 +18,7 @@ router.get("/",
 router.get("/activos",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.getPagosActivos
 );
@@ -26,7 +26,7 @@ router.get("/activos",
 router.get("/inactivos",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.getPagosInactivos
 );
@@ -35,7 +35,7 @@ router.get("/:id",
   [
     check("id", "Se necesita un mongoId válido").isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.getPagosID
 );
@@ -43,7 +43,7 @@ router.get("/:id",
 router.get("/fecha/:fecha",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.getPagosFecha
 );
@@ -51,7 +51,7 @@ router.get("/fecha/:fecha",
 router.get("/pago/:plan",
   [
     // validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.getPagosPlan
 );
@@ -60,7 +60,7 @@ router.get("/pagoo/:cliente",
   [
     check('cliente', 'Se necesita un mongoId válido en el campo del cliente').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.getPagosCliente
 );
@@ -76,7 +76,7 @@ router.post("/",
     // check("valor", "El valor debe ser numérico").notEmpty().isNumeric(),
     // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),    
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.postPagos
 );
@@ -91,7 +91,7 @@ router.put("/:id",
     // check("valor", "El valor debe ser numérico").optional().isNumeric(),
     // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.putPagos
 );
@@ -100,7 +100,7 @@ router.put("/activar/:id",
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.putPagosActivar
 );
@@ -109,7 +109,7 @@ router.put("/inactivar/:id",
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpPagos.putPagosInactivar
 );

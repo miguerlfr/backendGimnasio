@@ -3,7 +3,7 @@ import httpClientes from '../controllers/clientes.js';
 import { check } from 'express-validator';
 import helpersClientes from '../helpers/clientes.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
-// import { validarJWT } from '../middlewares/validar-jwt.js';
+import { validarJWT } from '../middlewares/validar-jwt.js';
 
 //   check('page', 'El parámetro "page" debe ser un número entero positivo').optional().isInt({ min: 1 }),
 //   check('limit', 'El parámetro "limit" debe ser un número entero positivo').optional().isInt({ min: 1 }),
@@ -13,7 +13,7 @@ const router = Router();
 router.get("/",
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientes
 );
@@ -21,7 +21,7 @@ router.get("/",
 router.get('/activos',
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientesActivos
 );
@@ -29,7 +29,7 @@ router.get('/activos',
 router.get('/inactivos',
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientesInactivos
 );
@@ -38,7 +38,7 @@ router.get('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientesID
 );
@@ -47,7 +47,7 @@ router.get('/seguimiento/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientesSeguimiento
 );
@@ -56,7 +56,7 @@ router.get('/plan/:plan',
   [
     // check('plan').custom(helpersClientes.getPlan),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientesPlan
 );
@@ -66,7 +66,7 @@ router.get('/cumpleanos/:fecha',
     check('fecha', 'La fecha debe ser una fecha válida').isISO8601().toDate(),
     check('fecha').custom(helpersClientes.getFechaCumpleaños),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientesCumpleaños
 );
@@ -76,7 +76,7 @@ router.get('/ingresaron/:fecha',
     check('fecha', 'La fecha debe ser una fecha válida').isISO8601().toDate(),
     check('fecha').custom(helpersClientes.getClientesIngresaron),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.getClientesIngresaron
 );
@@ -104,7 +104,7 @@ router.post('/',
       return true;
     }), 
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.postClientes
 );
@@ -132,7 +132,7 @@ router.put('/:id',
       return true;
     }), 
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.putClientes
 );
@@ -141,7 +141,7 @@ router.put('/activar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.putClientesActivar
 );
@@ -150,7 +150,7 @@ router.put('/inactivar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpClientes.putClientesInactivar
 );
