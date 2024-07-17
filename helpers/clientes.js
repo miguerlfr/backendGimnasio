@@ -1,11 +1,6 @@
 import Cliente from "../models/clientes.js";
-import Plane from "../models/planes.js"
 
 const helpersClientes = {
-	// getPlan: async (plan) => {
-	// 	const existe = await Plane.findOne({ plan });
-	// 	if (existe.length === 0) throw new Error("Plan no existe.");
-	// },
 	getFechaCumpleaños: async (fecha) => {
 		const existe = await Cliente.findOne({ fecha });
 		if (existe.length === 0) throw new Error("Fecha de cumpleaños no existe.");
@@ -24,12 +19,14 @@ const helpersClientes = {
 			throw new Error(`El documento ${documento} ya está en la base de datos, digitar un documento diferente por favor`);
 		}
 	},
-	putDocumento: async (documento) => {
-		const existe = await Cliente.findOne({ documento });
+	putDocumento: async (documento, id) => {
+		const documentoUnico = await Cliente.findOne({ documento, _id: { $ne: id } });
 		if (!documento) {
-			throw new Error("El documento es requerido");
+		  throw new Error("El documento es requerido");
+		} else if (documentoUnico) {
+		  throw new Error(`El documento ${documento} ya está en la base de datos, digitar un documento diferente por favor`);
 		}
-	}
+	  }
 };
 
 export default helpersClientes;

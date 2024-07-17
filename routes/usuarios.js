@@ -3,14 +3,14 @@ import httpUsuarios from '../controllers/usuarios.js';
 import { check } from 'express-validator';
 // import helpersUsuarios from '../helpers/usuarios.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
-import { validarJWT } from '../middlewares/validar-jwt.js';
+// import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
 
 router.get('/',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.getUsuarios
 );
@@ -18,7 +18,7 @@ router.get('/',
 router.get('/activos',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.getUsuariosActivos
 );
@@ -26,7 +26,7 @@ router.get('/activos',
 router.get('/inactivos',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.getUsuariosInactivos
 );
@@ -35,7 +35,7 @@ router.get('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.getUsuariosID
 );
@@ -57,7 +57,7 @@ router.post('/',
     // check('rol').custom(helpersUsuarios.postputRol).optional(),
     // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.postUsuarios
 );
@@ -72,7 +72,7 @@ router.put('/:id',
     // check('rol').custom(helpersUsuarios.postputRol).optional(),
     // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.putUsuarios
 );
@@ -81,7 +81,7 @@ router.put('/activar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.putUsuariosActivar
 );
@@ -90,7 +90,7 @@ router.put('/inactivar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpUsuarios.putUsuariosInactivar
 );

@@ -5,6 +5,14 @@ const httpProductos = {
         const productos = await Producto.find();
         res.json({ productos });
     },
+    getProductosActivos: async (req, res) => {
+      const productosAc = await Producto.find({ estado: 1 });
+      res.json({ productosAc });
+    },
+    getProductosInactivos: async (req, res) => {
+      const productosIn = await Producto.find({ estado: 0 });
+      res.json({ productosIn });
+    },
     getProductosTotal: async (req, res) => {
         const productosTotal = await Producto.find();
         const total = productosTotal.reduce((acc, item) => {
@@ -58,7 +66,17 @@ const httpProductos = {
         } catch (error) {
           res.status(500).json({ error: "Error al actualizar el producto" });
         }
-      }      
+      },
+      putProductosActivar: async (req, res) => {
+        const { id } = req.params;
+        const productos = await Producto.findByIdAndUpdate(id, { estado: 1 }, { new: true });
+        res.json({ productos });
+      },
+      putProductosInactivar: async (req, res) => {
+        const { id } = req.params;
+        const productos = await Producto.findByIdAndUpdate(id, { estado: 0 }, { new: true });
+        res.json({ productos });
+      },
 };
 
 export default httpProductos
