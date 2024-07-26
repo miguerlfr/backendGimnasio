@@ -5,7 +5,7 @@ const productoSchema = new mongoose.Schema({
     descripcion: { type: String },
     valor: { type: Number, required: true },
     cantidad: { type: Number, required: true },
-    estado: { type: Number, default: 1 }
+    estado: { type: Number }
 });
 
 export default mongoose.model("Producto", productoSchema);

@@ -15,6 +15,22 @@ router.get('/',
   httpMantenimientos.getMantenimientos
 );
 
+router.get('/activos',
+  [
+    validarCampos,
+    validarJWT
+  ],
+  httpMantenimientos.getMantenimientosActivos
+);
+
+router.get('/inactivos',
+  [
+    validarCampos,
+    validarJWT
+  ],
+  httpMantenimientos.getMantenimientosInactivos
+);
+
 router.get('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
@@ -34,14 +50,14 @@ router.get('/fechas/:fechaInicio/:fechaFin',
 
 router.post('/',
   [
-    // check('idMaquina', 'El idMaquina es requerido').notEmpty(),
-    // check('idMaquina', 'Se necesita que el idMaquina sea un mongoId válido').optional().isMongoId(),
-    // check('idMaquina').custom(helpersMantenimientos.postPutMaquina).optional(),
-    // check('fecha', 'La fecha debe estar en formato ISO8601').optional().isISO8601().toDate(),
-    // check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
-    // check('responsable', 'El responsable es requerido').notEmpty(),
-    // check('precio', 'El precio debe ser numérico y no puede estar vacío').optional().isNumeric(),
-    // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
+    check('idMaquina', 'El idMaquina es requerido').notEmpty(),
+    check('idMaquina', 'Se necesita que el idMaquina sea un mongoId válido').optional().isMongoId(),
+    check('idMaquina').custom(helpersMantenimientos.postPutMaquina).optional(),
+    check('fecha', 'La fecha debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
+    check('responsable', 'El responsable es requerido').notEmpty(),
+    check('precio', 'El precio debe ser numérico y no puede estar vacío').optional().isNumeric(),
+    check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
     validarJWT
   ],
@@ -50,13 +66,16 @@ router.post('/',
 
 router.put('/:id',
   [
-    // check('id', 'Se necesita un mongoId válido').isMongoId(),
-    // check('idMaquina', 'El ID de la máquina debe ser un ID de MongoID válido').optional().isMongoId(),
-    // check('idMaquina').custom(helpersMantenimientos.postPutMaquina).optional(),
-    // check('fecha', 'La fecha debe estar en formato ISO8601').optional().isISO8601().toDate(),
-    // check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
-    // check('precio', 'El precio debe ser numérico y no puede estar vacío').optional().isNumeric(),
-    // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
+    check('id', 'Se necesita un mongoId válido').isMongoId(),
+    check('id').custom(async (idMantenimiento, { req }) => {
+      await helpersMantenimientos.putId(idMantenimiento, req.body);
+    }),
+    check('idMaquina', 'El ID de la máquina debe ser un ID de MongoID válido').optional().isMongoId(),
+    check('idMaquina').custom(helpersMantenimientos.postPutMaquina).optional(),
+    check('fecha', 'La fecha debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
+    check('precio', 'El precio debe ser numérico y no puede estar vacío').optional().isNumeric(),
+    check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
     validarJWT
   ],

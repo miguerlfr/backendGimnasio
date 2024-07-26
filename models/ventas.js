@@ -9,7 +9,7 @@ const ventaSchema = new mongoose.Schema({
     },
     valorUnitario: { type: Number, required: true },
     cantidad: { type: Number, required: true },
-    valorTotal: { type: Number, required: true },
+    valorTotal: { type: Number },
 });
 
 export default mongoose.model("Venta", ventaSchema);

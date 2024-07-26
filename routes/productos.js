@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import httpProductos from '../controllers/productos.js';
 import { check } from 'express-validator';
+import helpersProductos from '../helpers/productos.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
 import { validarJWT } from '../middlewares/validar-jwt.js';
 
@@ -49,10 +50,10 @@ router.get('/:id',
 
 router.post('/',
   [
-    // check('codigo', 'El código es requerido y debe ser tipo texto').notEmpty().isString(),
-    // check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
-    // check('valor', 'El valor es requerido y debe ser numérico').notEmpty().isNumeric(),
-    // check('cantidad', 'La cantidad es requerido y debe ser numérica').notEmpty().isNumeric(),
+    check('codigo').custom(helpersProductos.postCodigo).optional(),
+    check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
+    check('valor', 'El valor es requerido y debe ser numérico').notEmpty().isNumeric(),
+    check('cantidad', 'La cantidad es requerido y debe ser numérica').notEmpty().isNumeric(),
     validarCampos,
     validarJWT
   ],
@@ -61,11 +62,14 @@ router.post('/',
 
 router.put('/:id',
   [
-    // check('id', 'Se necesita un mongoId válido').isMongoId(),
-    // check('codigo', 'El código es requerido y debe ser tipo texto').optional().isString(),
-    // check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
-    // check('valor', 'El valor debe ser numérico').optional().isNumeric(),
-    // check('cantidad', 'La cantidad debe ser numérica').optional().isNumeric(),
+    check('id', 'Se necesita un mongoId válido').isMongoId(),
+    check('id').custom(async (idProducto, { req }) => {
+      await helpersProductos.putId(idProducto, req.body);
+    }),
+    check('codigo').optional().trim().custom((codigo, { req }) => helpersProductos.putCodigo(codigo, req.params.id)),
+    check('descripcion', 'La descripción debe ser tipo texto').optional().isString(),
+    check('valor', 'El valor debe ser numérico').optional().isNumeric(),
+    check('cantidad', 'La cantidad debe ser numérica').optional().isNumeric(),
     validarCampos,
     validarJWT
   ],

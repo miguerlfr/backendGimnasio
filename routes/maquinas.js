@@ -42,11 +42,12 @@ router.get('/:id',
 
 router.post('/',
     [
-        // check('codigo', 'El código es requerido').notEmpty(),
-        // check('sede', 'La sede es requerida').notEmpty(),
-        // check('sede').custom(helpersMaquinas.postputID).optional(),
-        // check('fechaIngreso', 'La fecha de ingreso es requerida y debe estar en formato ISO8601').notEmpty().isISO8601().toDate(),
-        // check('FechaUltMan', 'La fecha de la última mantención debe estar en formato ISO8601').optional().isISO8601().toDate(),
+        check('codigo', 'El código es requerido').notEmpty(),
+        check('codigo').custom(helpersMaquinas.postCodigo).optional(),
+        check('sede', 'La sede es requerida').notEmpty(),
+        check('sede').custom(helpersMaquinas.postputID).optional(),
+        check('fechaIngreso', 'La fecha de ingreso es requerida y debe estar en formato ISO8601').notEmpty().isISO8601().toDate(),
+        check('FechaUltMan', 'La fecha de la última mantención debe estar en formato ISO8601').optional().isISO8601().toDate(),
         check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
         validarCampos,
         validarJWT
@@ -56,11 +57,15 @@ router.post('/',
 
 router.put('/:id',
     [
-        // check('id', 'El id del mantenimiento es requerido y debe ser un MongoID válido.').isMongoId(),
-        // check('sede').custom(helpersMaquinas.postputID).optional(),
-        // check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().isISO8601().toDate(),
-        // check('FechaUltMan', 'La fecha de la última mantención debe estar en formato ISO8601').optional().isISO8601().toDate(),
-        // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
+        check('id', 'El id del mantenimiento es requerido y debe ser un MongoID válido.').isMongoId(),
+        check('id').custom(async (idMaquina, { req }) => {
+            await helpersMaquinas.putId(idMaquina, req.body);
+        }),
+        check('codigo').optional().trim().custom((codigo, { req }) => helpersMaquinas.putCodigo(codigo, req.params.id)),
+        check('sede').custom(helpersMaquinas.postputID).optional(),
+        check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().isISO8601().toDate(),
+        check('FechaUltMan', 'La fecha de la última mantención debe estar en formato ISO8601').optional().isISO8601().toDate(),
+        check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
         validarCampos,
         validarJWT
     ],

@@ -54,7 +54,7 @@ router.get('/seguimiento/:id',
 
 router.get('/plan/:plan',
   [
-    // check('plan').custom(helpersClientes.getPlan),
+    check('plan').custom(helpersClientes.getPlan),
     validarCampos,
     validarJWT
   ],
@@ -84,25 +84,22 @@ router.get('/ingresaron/:fecha',
 router.post('/',
   [
     check('nombre', 'El nombre es requerido y no puede estar vacío').trim().notEmpty(),
-    check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().isISO8601().toDate(), //Fechas no necesitan trim
+    check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().toDate(), //Fechas no necesitan trim
     check('documento').custom(helpersClientes.postDocumento).optional(),
-    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().isISO8601().toDate(),
-    check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isNumeric(),   
+    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().toDate(),
+    check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isNumeric(),
     check('observaciones', 'Las observaciones no pueden estar vacío').optional().trim(),
     check('objetivo', 'El objetivo es requerido y no puede estar vacío').trim().notEmpty(),
     check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
-    // check('plan', 'El plan es requerido y no puede estar vacío').trim().notEmpty(),
+    check('plan', 'El plan es requerido y no puede estar vacío').trim().notEmpty(),
     check('fechaVencimiento', 'La fecha de Vencimiento debe estar en formato ISO8601').optional().toDate(),
-    check('seguimiento.*.fecha', 'La fecha del Seguimiento debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('seguimiento.*.fecha', 'La fecha del Seguimiento debe estar en formato ISO8601').optional().toDate(),
     check('seguimiento').optional().isArray().withMessage('Seguimiento debe ser un array'),
-    check('seguimiento.*').optional().custom((value) => {
-      const numericFields = ['peso', 'imc', 'brazo', 'pierna', 'cintura', 'estaturaMetros', 'estaturaCentimetros'];
-      const isValid = numericFields.every(field => typeof value[field] === 'number' && !isNaN(value[field]));
-      if (!isValid) {
-        throw new Error(`Alguno de los campos en el seguimiento no es un número`);
-      }
-      return true;
-    }), 
+    check('seguimiento.*.peso').optional().isNumeric().withMessage('El campo peso debe ser un número válido'),
+    check('seguimiento.*.brazo').optional().isNumeric().withMessage('El campo brazo debe ser un número válido'),
+    check('seguimiento.*.pierna').optional().isNumeric().withMessage('El campo pierna debe ser un número válido'),
+    check('seguimiento.*.cintura').optional().isNumeric().withMessage('El campo cintura debe ser un número válido'),
+    check('seguimiento.*.estatura').optional().isNumeric().withMessage('El campo estatura (metros) debe ser un número válido'),
     validarCampos,
     validarJWT
   ],
@@ -112,25 +109,25 @@ router.post('/',
 router.put('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
+    check('id').custom(async (idCliente, { req }) => {
+      await helpersClientes.putId(idCliente, req.body);
+    }),
     check('nombre', 'El nombre no pueden estar vacío').optional().trim(),
-    check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().trim().isISO8601().toDate(), //Fechas no necesitan trim
+    check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().isISO8601().toDate(),
     check('documento').optional().trim().custom((documento, { req }) => helpersClientes.putDocumento(documento, req.params.id)),
-    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().trim().isISO8601().toDate(),
+    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().isISO8601().toDate(),
     check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isNumeric(),
     check('objetivo', 'El objetivo no pueden estar vacío').optional().trim(),
     check('observaciones', 'Las observaciones no pueden estar vacío').optional().trim(),
     check('plan', 'El plan no pueden estar vacío').optional().trim(),
-    check('fechaVencimiento', 'La fecha de Vencimiento debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('fechaVencimiento', 'La fecha de Vencimiento debe estar en formato ISO8601').optional().toDate(),
     check('seguimiento.*.fecha', 'La fecha del Seguimiento debe estar en formato ISO8601').optional().isISO8601().toDate(),
     check('seguimiento').optional().isArray().withMessage('Seguimiento debe ser un array'),
-    check('seguimiento.*').optional().custom((value) => {
-      const numericFields = ['peso', 'imc', 'brazo', 'pierna', 'cintura', 'estaturaMetros', 'estaturaCentimetros'];
-      const isValid = numericFields.every(field => typeof value[field] === 'number' && !isNaN(value[field]));
-      if (!isValid) {
-        throw new Error(`Alguno de los campos en el seguimiento no es un número`);
-      }
-      return true;
-    }), 
+    check('seguimiento.*.peso').optional().isNumeric().withMessage('El campo peso debe ser un número válido'),
+    check('seguimiento.*.brazo').optional().isNumeric().withMessage('El campo brazo debe ser un número válido'),
+    check('seguimiento.*.pierna').optional().isNumeric().withMessage('El campo pierna debe ser un número válido'),
+    check('seguimiento.*.cintura').optional().isNumeric().withMessage('El campo cintura debe ser un número válido'),
+    check('seguimiento.*.estatura').optional().isNumeric().withMessage('El campo estatura (metros) debe ser un número válido'),
     validarCampos,
     validarJWT
   ],

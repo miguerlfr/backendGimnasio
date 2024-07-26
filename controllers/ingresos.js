@@ -21,6 +21,21 @@ const httpIngresos = {
 			res.status(500).json({ error: "Error al obtener el ingreso" });
 		}
 	},
+	getIngresosFechas: async (req, res) => {
+		try {
+			const { fechaInicio, fechaFin } = req.params;
+			const fechaInicioObj = new Date(fechaInicio);
+			const fechaFinObj = new Date(fechaFin);
+			const ingresos = await Ingreso.find({
+				fecha: { $gte: fechaInicioObj, $lte: fechaFinObj },
+			}).populate("codigoProducto", "descripcion");
+			res.json({ ingresos });
+			console.log(ingresos);
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: `Error al listar ingresos por fechas: ${error.message}` });
+		}
+	},
 	postIngresos: async (req, res) => {
 		try {
 			const { fecha, sede, cliente } = req.body;
@@ -32,7 +47,7 @@ const httpIngresos = {
 
 			await ingreso.save()
 			res.json({ ingreso });
-			
+
 		} catch (error) {
 			res.status(500).json({ error: `Error al crear los ingresos: ${error.message}` });
 		}
@@ -48,7 +63,9 @@ const httpIngresos = {
 			}
 			res.json({ ingreso: ingresoActualizado });
 		} catch (error) {
-			res.status(500).json({ error: "Ningún campo proporcionado para actualizar" });
+			// Manejar errores
+			console.log("error:", error);
+			res.status(400).json({ error: `No se pudo editar el ingreso ${error.message}` });
 		}
 	},
 };

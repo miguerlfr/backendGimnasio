@@ -10,7 +10,7 @@ const maquinaSchema = new mongoose.Schema({
     descripcion: { type: String },
     fechaIngreso: { type: Date, required: true },
     fechaUltMan: { type: Date },
-    estado: { type: Number, default: 1 }
+    estado: { type: Number }
 });
 
 export default mongoose.model('Maquina', maquinaSchema);

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import httpSedes from "../controllers/sedes.js";
 import { check } from "express-validator";
+import helpersSedes from '../helpers/sedes.js';
 import { validarCampos } from "../middlewares/validar-campos.js";
 import { validarJWT } from '../middlewares/validar-jwt.js';
 
@@ -41,10 +42,11 @@ router.get("/:id",
 
 router.post("/",
   [
-    // check("nombre", "El nombre es requerido").notEmpty(),
-    // check("codigo", "El código es requerido").notEmpty(),
-    // check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isMobilePhone("any", { strictMode: false }),
-    // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
+    check("nombre", "El nombre es requerido").notEmpty(),
+    check("codigo", "El código es requerido").notEmpty(),
+    check('codigo').custom(helpersSedes.postCodigo).optional(),
+    check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isMobilePhone("any", { strictMode: false }),
+    check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
     validarJWT
   ],
@@ -53,9 +55,14 @@ router.post("/",
 
 router.put("/:id",
   [
-    // check("id", "Se necesita un ID válido").isMongoId(),
-    // check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isMobilePhone("any", { strictMode: false }),
-    // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
+    check("id", "Se necesita un ID válido").isMongoId(),
+    check('id').custom(async (idSede, { req }) => {
+      // Pasa el id y los datos del body a la función putId
+      await helpersSedes.putId(idSede, req.body);
+    }).optional(),
+    check('codigo').optional().trim().custom((codigo, { req }) => helpersSedes.putCodigo(codigo, req.params.id)),
+    check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isMobilePhone("any", { strictMode: false }),
+    check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
     validarJWT
   ],

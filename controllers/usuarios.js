@@ -8,12 +8,12 @@ const httpUsuarios = {
 		res.json({ usuarios });
 	},
 	getUsuariosActivos: async (req, res) => {
-		const usuariosAc = await Usuario.find({ estado: 1 }).populate('sede', 'nombre');
-		res.json({ usuariosAc });
+		const usuarios = await Usuario.find({ estado: 1 }).populate('sede', 'nombre');
+		res.json({ usuarios });
 	},
 	getUsuariosInactivos: async (req, res) => {
-		const usuariosIn = await Usuario.find({ estado: 0 }).populate('sede', 'nombre');
-		res.json({ usuariosIn });
+		const usuarios = await Usuario.find({ estado: 0 }).populate('sede', 'nombre');
+		res.json({ usuarios });
 	},
 	getUsuariosID: async (req, res) => {
 		const { id } = req.params;
@@ -87,10 +87,9 @@ const httpUsuarios = {
 			usuario
 		});
 		} catch (error) {
-			console.log(error);
-			return res.status(500).json({
-				msg: 'Error.', error
-			});
+			// Manejar errores
+			console.log("error:", error);
+			res.status(400).json({ error: `No se pudo crear el usuario ${error.message}` });
 		}
 	},
 	putUsuarios: async (req, res) => {
@@ -120,7 +119,9 @@ const httpUsuarios = {
 			return res.json({ usuario });
 
 		} catch (error) {
-			return res.status(500).json({ error: "Error al actualizar el usuario" });
+			// Manejar errores
+			console.log("error:", error);
+			res.status(400).json({ error: `No se pudo editar el usuario ${error.message}` });
 		}
 	},
 	putUsuariosActivar: async (req, res) => {

@@ -26,11 +26,10 @@ const clienteSchema = new mongoose.Schema({
             brazo: { type: Number },
             pierna: { type: Number },
             cintura: { type: Number },
-            estaturaMetros: { type: Number },
-            estaturaCentimetros: { type: Number }
+            estatura: { type: Number },
         }
     ],
-    estado: { type: Number, default: 1 }
+    estado: { type: Number }
 });
 
 export default mongoose.model("Cliente", clienteSchema);
@@ -54,8 +53,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //             "brazo": 28,
 //             "pierna": 53,
 //             "cintura": 75,
-//             "estaturaMetros": 155,
-//             "estaturaCentimetros": 50,
+//             "estatura": 1.50,
 //         }
 //     ]
 // }
@@ -77,8 +75,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //             "brazo": 32,
 //             "pierna": 57,
 //             "cintura": 85,
-//             "estaturaMetros": 165,
-//             "estaturaCentimetros": 50,
+//             "estatura": 1.50,
 //         }
 //     ]
 // }
@@ -100,8 +97,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //             "brazo": 33,
 //             "pierna": 58,
 //             "cintura": 87,
-//             "estaturaMetros": 170,
-//             "estaturaCentimetros": 50,
+//             "estatura": 1.50,
 //         }
 //     ]
 // }
@@ -123,8 +119,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //             "brazo": 30,
 //             "pierna": 55,
 //             "cintura": 80,
-//             "estaturaMetros": 160,
-//             "estaturaCentimetros": 50,
+//             "estatura": 1.50,
 //         }
 //     ]
 // }
@@ -146,8 +141,7 @@ export default mongoose.model("Cliente", clienteSchema);
 //             "brazo": 35,
 //             "pierna": 60,
 //             "cintura": 90,
-//             "estaturaMetros": 175,
-//             "estaturaCentimetros": 50,
+//             "estatura": 1.50,
 //         }
 //     ]
 // }

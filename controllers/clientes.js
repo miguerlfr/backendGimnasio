@@ -7,12 +7,12 @@ const httpClientes = {
 		res.json({ clientes });
 	},
 	getClientesActivos: async (req, res) => {
-		const clientesAc = await Cliente.find({ estado: 1 }).populate("plan", "descripcion");
-		res.json({ clientesAc });
+		const clientes = await Cliente.find({ estado: 1 }).populate("plan", "descripcion");
+		res.json({ clientes });
 	},
 	getClientesInactivos: async (req, res) => {
-		const clientesIn = await Cliente.find({ estado: 0 }).populate("plan", "descripcion");
-		res.json({ clientesIn });
+		const clientes = await Cliente.find({ estado: 0 }).populate("plan", "descripcion");
+		res.json({ clientes });
 	},
 	getClientesID: async (req, res) => {
 		const { id } = req.params;
@@ -77,18 +77,16 @@ const httpClientes = {
 			// Calcular el IMC y su clasificación si el peso y la estatura están disponibles
 			if (seguimiento && seguimiento.length > 0) {
 				seguimiento.forEach((seg) => {
-					// Verificar que el peso y las estaturas sean números válidos
+					// Verificar que el peso y la estatura sean números válidos
 					const peso = parseFloat(seg.peso);
-					const estaturaMetros = parseFloat(seg.estaturaMetros) || 0; // En metros
-					const estaturaCentimetros = parseFloat(seg.estaturaCentimetros) || 0; // En centímetros
+					const estatura = parseFloat(seg.estatura);
 
-					if (!isNaN(peso) && (!isNaN(estaturaMetros) || !isNaN(estaturaCentimetros))) {
-						// Convertir la estatura total a metros
-						const estaturaTotalMetros = estaturaMetros + estaturaCentimetros / 100;
+					if (!isNaN(peso) && !isNaN(estatura)) {
+						const estaturaTotal = estatura / 100;
 
-						if (estaturaTotalMetros > 0) {
+						if (estaturaTotal > 0) {
 							// Calcular el IMC
-							seg.imc = peso / estaturaTotalMetros ** 2;
+							seg.imc = peso / estaturaTotal ** 2;
 
 							// Clasificar el IMC
 							if (seg.imc < 18.5) {
@@ -105,10 +103,10 @@ const httpClientes = {
 								seg.estadoIMC = "Obesidad 3";
 							}
 						} else {
-							console.error(`Estatura inválida para el seguimiento: ${seg.estaturaMetros} metros, ${seg.estaturaCentimetros} centímetros`);
+							console.error(`Estatura inválida para el seguimiento: ${seg.estatura}`);
 						}
 					} else {
-						console.error(`Datos inválidos para el seguimiento: Peso - ${seg.peso}, Estatura - ${seg.estaturaMetros} metros, ${seg.estaturaCentimetros} centímetros`);
+						console.error(`Datos inválidos para el seguimiento: Peso - ${seg.peso}, Estatura - ${seg.estatura}`);
 					}
 				});
 			}
@@ -134,7 +132,7 @@ const httpClientes = {
 				estado,
 				plan,
 				fechaVencimiento: new Date(new Date(fechaIngreso).setDate(new Date(fechaIngreso).getDate() + planData.dias)), // Usar la fecha calculada
-				seguimiento
+				seguimiento,
 			});
 
 			// Guardar el cliente en la base de datos
@@ -150,75 +148,73 @@ const httpClientes = {
 		}
 	},
 	putClientes: async (req, res) => {
-		const { id } = req.params;
-		let { nombre, fechaIngreso, documento, fechaNacimiento, edad, direccion, telefono, objetivo, observaciones, plan, fechaVencimiento, seguimiento } = req.body;
+		try {
+			const { id } = req.params;
+			let { nombre, fechaIngreso, documento, fechaNacimiento, edad, direccion, telefono, objetivo, observaciones, plan, fechaVencimiento, seguimiento } = req.body;
 
-		// Obtener el plan para calcular la fecha de vencimiento
-		const planData = await Plane.findById(plan);
-		// console.log("plan", plan);
-		if (!planData) {
-			throw new Error("Plan no encontrado");
-		}
+			// Obtener el plan para calcular la fecha de vencimiento
+			const planData = await Plane.findById(plan);
+			// console.log("plan", plan);
+			if (!planData) {
+				throw new Error("Plan no encontrado");
+			}
 
-		const camposActualizables = {
-			nombre,
-			fechaIngreso,
-			documento,
-			fechaNacimiento,
-			edad: new Date().getFullYear() - new Date(fechaNacimiento).getFullYear(),
-			direccion,
-			telefono,
-			objetivo,
-			observaciones,
-			plan,
-			fechaVencimiento: new Date(new Date(fechaIngreso).setDate(new Date(fechaIngreso).getDate() + planData.dias)),
-			seguimiento,
-		};
+			const camposActualizables = {
+				nombre,
+				fechaIngreso,
+				documento,
+				fechaNacimiento,
+				edad: new Date().getFullYear() - new Date(fechaNacimiento).getFullYear(),
+				direccion,
+				telefono,
+				objetivo,
+				observaciones,
+				plan,
+				fechaVencimiento: new Date(new Date(fechaIngreso).setDate(new Date(fechaIngreso).getDate() + planData.dias)),
+				seguimiento,
+			};
 
-		if (Object.keys(camposActualizables).length === 0) {
-			return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });
-		}
+			if (Object.keys(camposActualizables).length === 0) {
+				return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });
+			}
 
-		// Calcular el IMC y su clasificación si el peso y la estatura están disponibles
-		if (seguimiento && seguimiento.length > 0) {
-			seguimiento.forEach((seg) => {
-				// Verificar que el peso y las estaturas sean números válidos
-				const peso = parseFloat(seg.peso);
-				const estaturaMetros = parseFloat(seg.estaturaMetros) || 0; // En metros
-				const estaturaCentimetros = parseFloat(seg.estaturaCentimetros) || 0; // En centímetros
+			// Calcular el IMC y su clasificación si el peso y la estatura están disponibles
+			if (seguimiento && seguimiento.length > 0) {
+				seguimiento.forEach((seg) => {
+					// Verificar que el peso y la estatura sean números válidos
+					const peso = parseFloat(seg.peso);
+					const estatura = parseFloat(seg.estatura);
 
-				if (!isNaN(peso) && (!isNaN(estaturaMetros) || !isNaN(estaturaCentimetros))) {
-					// Convertir la estatura total a metros
-					const estaturaTotalMetros = estaturaMetros + estaturaCentimetros / 100;
+					if (!isNaN(peso) && !isNaN(estatura)) {
+						const estaturaTotal = estatura / 100;
 
-					if (estaturaTotalMetros > 0) {
-						// Calcular el IMC
-						seg.imc = peso / estaturaTotalMetros ** 2;
+						if (estaturaTotal > 0) {
+							// Calcular el IMC
+							seg.imc = peso / estaturaTotal ** 2;
 
-						// Clasificar el IMC
-						if (seg.imc < 18.5) {
-							seg.estadoIMC = "Bajo peso";
-						} else if (seg.imc >= 18.5 && seg.imc < 24.9) {
-							seg.estadoIMC = "Normal";
-						} else if (seg.imc >= 25 && seg.imc < 29.9) {
-							seg.estadoIMC = "Sobrepeso";
-						} else if (seg.imc >= 30 && seg.imc < 34.9) {
-							seg.estadoIMC = "Obesidad 1";
-						} else if (seg.imc >= 35 && seg.imc < 39.9) {
-							seg.estadoIMC = "Obesidad 2";
-						} else if (seg.imc >= 40) {
-							seg.estadoIMC = "Obesidad 3";
+							// Clasificar el IMC
+							if (seg.imc < 18.5) {
+								seg.estadoIMC = "Bajo peso";
+							} else if (seg.imc >= 18.5 && seg.imc < 24.9) {
+								seg.estadoIMC = "Normal";
+							} else if (seg.imc >= 25 && seg.imc < 29.9) {
+								seg.estadoIMC = "Sobrepeso";
+							} else if (seg.imc >= 30 && seg.imc < 34.9) {
+								seg.estadoIMC = "Obesidad 1";
+							} else if (seg.imc >= 35 && seg.imc < 39.9) {
+								seg.estadoIMC = "Obesidad 2";
+							} else if (seg.imc >= 40) {
+								seg.estadoIMC = "Obesidad 3";
+							}
+						} else {
+							console.error(`Estatura inválida para el seguimiento: ${seg.estatura}`);
 						}
 					} else {
-						console.error(`Estatura inválida para el seguimiento: ${seg.estaturaMetros} metros, ${seg.estaturaCentimetros} centímetros`);
+						console.error(`Datos inválidos para el seguimiento: Peso - ${seg.peso}, Estatura - ${seg.estatura}`);
 					}
-				} else {
-					console.error(`Datos inválidos para el seguimiento: Peso - ${seg.peso}, Estatura - ${seg.estaturaMetros} metros, ${seg.estaturaCentimetros} centímetros`);
-				}
-			});
-		}
+				});
+			}
 
-		try {
 			const clienteActualizado = await Cliente.findByIdAndUpdate(id, camposActualizables, { new: true });
 			if (!clienteActualizado) {
 				return res.status(404).json({ error: "ID del Cliente no encontrado" });
@@ -227,7 +223,7 @@ const httpClientes = {
 		} catch (error) {
 			// Manejar errores
 			console.log("error:", error);
-			res.status(400).json({ error: `No se pudo actualizar el cliente ${error.message}` });
+			res.status(400).json({ error: `No se pudo editar el cliente ${error.message}` });
 		}
 	},
 	putClientesActivar: async (req, res) => {

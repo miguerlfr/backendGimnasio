@@ -7,7 +7,7 @@ const sedeSchema = new mongoose.Schema({
     horario: { type: String },
     ciudad: { type: String },
     telefono: { type: Number },
-    estado: { type: Number, default: 1 },
+    estado: { type: Number },
 });
 
 export default mongoose.model("Sede", sedeSchema);

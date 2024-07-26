@@ -40,7 +40,7 @@ router.get("/:id",
   httpPagos.getPagosID
 );
 
-router.get("/fecha/:fecha",
+router.get("/fechas/:fechaInicio/:fechaFin",
   [
     validarCampos,
     validarJWT
@@ -67,14 +67,14 @@ router.get("/pagoo/:cliente",
 
 router.post("/",
   [
-    // check("cliente", "El cliente es requerido").notEmpty(),
-    // check('cliente', 'El cliente debe ser un ID de MongoID válido').optional().isMongoId(),
-    // check('cliente').custom(helpersPagos.postPutId).optional(),
-    // check("plan", "El plan es requerido").notEmpty(),
-    // check("plan").optional(helpersPagos.postPutPlan).optional(),
-    // check("fecha", "La fecha es requerida y debe estar en formato ISO8601").notEmpty().isISO8601().toDate(),
-    // check("valor", "El valor debe ser numérico").notEmpty().isNumeric(),
-    // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),    
+    check("cliente", "El cliente es requerido").notEmpty(),
+    check('cliente', 'El cliente debe ser un ID de MongoID válido').optional().isMongoId(),
+    check('cliente').custom(helpersPagos.postPutId).optional(),
+    check("plan", "El plan es requerido").notEmpty(),
+    check("plan").optional(helpersPagos.postPutPlan).optional(),
+    check("fecha", "La fecha es requerida y debe estar en formato ISO8601").notEmpty().isISO8601().toDate(),
+    check("valor", "El valor debe ser numérico").notEmpty().isNumeric(),
+    check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),    
     validarCampos,
     validarJWT
   ],
@@ -83,13 +83,16 @@ router.post("/",
 
 router.put("/:id",
   [
-    // check("id", "Se necesita un mongoId válido").isMongoId(),
-    // check('cliente', 'El cliente debe ser un ID de MongoID válido').optional().isMongoId(),
-    // check('cliente').custom(helpersPagos.postPutId).optional(),
-    // check("plan").optional(helpersPagos.postPutPlan).optional(),
-    // check("fecha", "La fecha es requerida y debe estar en formato ISO8601").optional().isISO8601().toDate(),
-    // check("valor", "El valor debe ser numérico").optional().isNumeric(),
-    // check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
+    check("id", "Se necesita un mongoId válido").isMongoId(),    
+    check('id').custom(async (idPago, { req }) => {
+      await helpersPagos.putId(idPago, req.body);
+    }),
+    check('cliente', 'El cliente debe ser un ID de MongoID válido').optional().isMongoId(),
+    check('cliente').custom(helpersPagos.postPutId).optional(),
+    check("plan").optional(helpersPagos.postPutPlan).optional(),
+    check("fecha", "La fecha es requerida y debe estar en formato ISO8601").optional().isISO8601().toDate(),
+    check("valor", "El valor debe ser numérico").optional().isNumeric(),
+    check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
     validarJWT
   ],
