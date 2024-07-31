@@ -1,18 +1,20 @@
 import Cliente from "../models/clientes.js";
+import mongoose from "mongoose";
+let ObjectId = mongoose.Types.ObjectId
 
-const helpersClientes = {
+let helpersClientes = {
 	getFechaCumpleaños: async (fecha) => {
-		const existe = await Cliente.findOne({ fecha });
+		let existe = await Cliente.findOne({ fecha });
 		if (existe.length === 0) throw new Error("Fecha de cumpleaños no existe.");
 	},
 	getClientesIngresaron: async (fecha) => {
-		const clientesCantidad = await Cliente.countDocuments({
+		let clientesCantidad = await Cliente.countDocuments({
 			fechaIngreso: new Date(fecha),
 		});
 		if (clientesCantidad === 0) throw new Error(`No hay clientes que ingresaron en esa fecha`);
 	},
 	postDocumento: async (documento) => {
-		const existe = await Cliente.findOne({ documento });
+		let existe = await Cliente.findOne({ documento });
 		if (!documento) {
 			throw new Error("El documento es requerido");
 		} else if (existe) {
@@ -20,7 +22,7 @@ const helpersClientes = {
 		}
 	},
 	putDocumento: async (documento, id) => {
-		const documentoUnico = await Cliente.findOne({ documento, _id: { $ne: id } });
+		let documentoUnico = await Cliente.findOne({ documento, _id: { $ne: id } });
 		if (!documento) {
 			throw new Error("El documento es requerido");
 		} else if (documentoUnico) {
@@ -28,115 +30,141 @@ const helpersClientes = {
 		}
 	},
 	putId: async (idCliente, datosActualizados) => {
-		// Buscar el cliente por ID
 		const clienteActual = await Cliente.findById(idCliente);
 		if (!clienteActual) {
 			throw new Error("Cliente no encontrado");
 		}
 
-		// Imprimir datos actuales y actualizados para depuración
-		// console.log("Cliente Actual:", clienteActual);
-		// console.log("Datos Actualizados:", datosActualizados);
+		console.log("Cliente Actual Completo:", JSON.stringify(clienteActual, null, 2));
+		console.log("Datos Actualizados:", JSON.stringify(datosActualizados, null, 2));
 
-		let datosIguales = true;
-		const diferencias = {};
+		const normalizarFecha = (fecha) => {
+			if (!fecha) return null;
 
-		// Comparar datos actuales con datos actualizados
-		for (const key of Object.keys(datosActualizados)) {
-			let valorActual = clienteActual[key];
-			let valorActualizado = datosActualizados[key];
-
-			// Manejar el caso específico de fechas
-			if (['fechaIngreso', 'fechaNacimiento', 'fechaVencimiento', 'seguimiento.fecha'].includes(key)) {
-				valorActual = valorActual instanceof Date ? valorActual.toISOString().split('T')[0] : valorActual;
-				valorActualizado = typeof valorActualizado === 'string' ? valorActualizado : new Date(valorActualizado).toISOString().split('T')[0];
+			let date;
+			if (typeof fecha === 'string') {
+				date = new Date(fecha);
+			} else if (fecha instanceof Date) {
+				date = fecha;
+			} else {
+				date = new Date(fecha);
 			}
 
-			// Manejar el caso del arreglo seguimiento
-			if (key === 'seguimiento') {
-				if (Array.isArray(valorActual) && Array.isArray(valorActualizado)) {
-					if (valorActual.length !== valorActualizado.length) {
-						datosIguales = false;
-						diferencias[key] = { valorActual, valorActualizado };
-						continue;
-					}
+			if (isNaN(date.getTime())) {
+				console.error(`Fecha no válida: ${fecha}`);
+				return null;
+			}
 
-					valorActual.forEach((item, index) => {
-						const itemActualizado = valorActualizado[index];
-						for (const innerKey of Object.keys(item)) {
-							let valorItemActual = item[innerKey];
-							let valorItemActualizado = itemActualizado[innerKey];
+			// Obtener año, mes y día en formato YYYY-MM-DD
+			const año = date.getUTCFullYear().toString().padStart(4, '0'); // Año con 4 dígitos
+			const mes = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+			const día = date.getUTCDate().toString().padStart(2, '0');
 
-							if (innerKey === 'fecha') {
-								valorItemActual = valorItemActual instanceof Date ? valorItemActual.toISOString().split('T')[0] : valorItemActual;
-								valorItemActualizado = typeof valorItemActualizado === 'string' ? valorItemActualizado : new Date(valorItemActualizado).toISOString().split('T')[0];
-							}
+			return `${año}-${mes}-${día}`;
+		};
 
-							const valorItemActualStr = (valorItemActual || '').toString();
-							const valorItemActualizadoStr = (valorItemActualizado || '').toString();
+		const simplificarSeguimiento = (seguimiento) => seguimiento.map(item => ({
+			fecha: normalizarFecha(item.fecha),
+			peso: item.peso !== undefined ? item.peso.toString() : '',
+			imc: item.imc !== undefined ? item.imc.toString() : '',
+			estadoIMC: item.estadoIMC,
+			brazo: item.brazo !== undefined ? item.brazo.toString() : '',
+			pierna: item.pierna !== undefined ? item.pierna.toString() : '',
+			cintura: item.cintura !== undefined ? item.cintura.toString() : '',
+			estatura: item.estatura !== undefined ? item.estatura.toString() : ''
+		}));
 
-							if (valorItemActualStr !== valorItemActualizadoStr) {
-								datosIguales = false;
-								if (!diferencias[key]) diferencias[key] = [];
-								diferencias[key].push({ index, innerKey, valorItemActual, valorItemActualizado });
-							}
-						}
-					});
-					continue;
+		const seguimientoActual = simplificarSeguimiento(clienteActual.seguimiento);
+		const seguimientoActualizado = datosActualizados.seguimiento ? simplificarSeguimiento(datosActualizados.seguimiento) : [];
+
+		console.log("Seguimiento Actual Simplificado:", seguimientoActual);
+		console.log("Nuevo Seguimiento Simplificado:", seguimientoActualizado);
+
+		const normalizarFechasEnObjeto = (obj) => {
+			Object.keys(obj).forEach(key => {
+				if (key.includes('fecha')) {
+					obj[key] = normalizarFecha(obj[key]);
 				}
+				if (Array.isArray(obj[key])) {
+					obj[key] = obj[key].map(item => {
+						if (item.fecha) {
+							item.fecha = normalizarFecha(item.fecha);
+						}
+						return item;
+					});
+				}
+			});
+		};
 
-				datosIguales = false;
-				diferencias[key] = { valorActual, valorActualizado };
-				continue;
+		// Normalizar fechas en ambos objetos
+		normalizarFechasEnObjeto(clienteActual._doc);
+		normalizarFechasEnObjeto(datosActualizados);
+
+		const encontrarDiferencias = (obj1, obj2) => {
+			const diferencias = {};
+			Object.keys(obj1).forEach(key => {
+				if (['_id', 'estado', '__v'].includes(key)) {
+					return;
+				}
+				if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
+					const diffs = encontrarDiferencias(obj1[key][0], obj2[key][0]);
+					if (Object.keys(diffs).length > 0) {
+						diferencias[key] = diffs;
+					}
+				} else {
+					const valorActual = obj1[key];
+					const valorActualizado = obj2[key];
+					const valorActualNormalizado = key.includes('fecha') ? normalizarFecha(valorActual) : valorActual;
+					const valorActualizadoNormalizado = key.includes('fecha') ? normalizarFecha(valorActualizado) : valorActualizado;
+
+					if (valorActualNormalizado !== valorActualizadoNormalizado) {
+						if (obj1[key] instanceof ObjectId && obj2[key] === obj1[key].toString()) {
+							return;
+						}
+						diferencias[key] = { valorActual: valorActualNormalizado, valorActualizado: valorActualizadoNormalizado };
+					}
+				}
+			});
+			return diferencias;
+		};
+
+		const diferencias = encontrarDiferencias(clienteActual.toObject(), datosActualizados);
+		console.log('Diferencias encontradas:', diferencias);
+
+		const cambiosEnCamposClaveSeguimiento = Object.values(diferencias).some(dif => {
+			if (typeof dif === 'object' && dif !== null) {
+				const hayCambio = ['peso', 'cintura', 'brazo', 'pierna', 'fecha', 'estatura'].some(campo =>
+					dif[campo] && dif[campo].valorActual !== dif[campo].valorActualizado
+				);
+				return hayCambio;
 			}
+			return false;
+		});
 
-			// Comparar valores simples
-			const valorActualStr = (valorActual || '').toString();
-			const valorActualizadoStr = (valorActualizado || '').toString();
+		console.log('cambiosEnCamposClaveSeguimiento:', cambiosEnCamposClaveSeguimiento);
 
-			if (valorActualStr !== valorActualizadoStr) {
-				datosIguales = false;
-				diferencias[key] = { valorActual, valorActualizado };
-			}
-		}
+		const hayDiferenciasAdicionales = Object.keys(datosActualizados).some(key => {
+			if (key === 'seguimiento') return false;
+			const valorActual = clienteActual[key] ? clienteActual[key].toString() : '';
+			const valorActualizado = datosActualizados[key] ? datosActualizados[key].toString() : '';
+			const esDiferente = valorActual !== valorActualizado;
+			console.log(`Revisando campo: ${key}, valor actual: ${valorActual}, valor actualizado: ${valorActualizado}, es diferente: ${esDiferente}`);
+			return esDiferente;
+		});
 
-		// Diferencias permitidas
-		const diferenciasPermitidas = [
-			'__parentArray',
-			'$__parent',
-			'$__',
-			'_doc'
-		];
+		console.log('hayDiferenciasAdicionales:', hayDiferenciasAdicionales);
 
-		// Verificar si solo hay diferencias permitidas en seguimiento
-		const diferenciasPermitidasEncontradas = diferencias.seguimiento?.filter(dif => diferenciasPermitidas.includes(dif.innerKey)) || [];
+		const datosIguales = Object.keys(diferencias).length === 0 && !hayDiferenciasAdicionales;
+		console.log('Datos Iguales:', datosIguales);
 
-		// Verificar si todas las diferencias encontradas en seguimiento son permitidas
-		const soloDiferenciasPermitidas = diferencias.seguimiento && diferencias.seguimiento.length === diferenciasPermitidasEncontradas.length;
-
-		// Verificar si hay diferencias adicionales en otros campos, como 'nombre'
-		const hayDiferenciasAdicionales = Object.keys(diferencias).some(key => key !== 'seguimiento' && Object.keys(diferencias[key]).length > 0);
-
-		// Imprimir resultado de la comparación y diferencias
-		// console.log("Datos Iguales:", datosIguales);
-		// console.log("Diferencias encontradas:", diferencias);
-
-		if (!datosIguales) {
-			// Si hay diferencias adicionales fuera de 'seguimiento', generamos error
-			if (!hayDiferenciasAdicionales) {
-				console.log("Ningún cambio proporcionado para editar.");
-				throw new Error("Ningún cambio proporcionado para editar.");
-			} else if (!soloDiferenciasPermitidas) {
-				// Si solo hay diferencias en 'seguimiento' que no están permitidas, generamos error
-				// console.log("Ningún cambio proporcionado para editar.");
-				throw new Error("Ningún cambio proporcionado para editar.");
-			}
+		if (datosIguales) {
+			console.log("Ningún cambio proporcionado para editar.");
+			throw new Error("Ningún cambio proporcionado para editar.");
 		} else {
 			console.log("Cliente actualizado exitosamente");
-			// Actualizar el cliente si los datos son diferentes
 			await Cliente.findByIdAndUpdate(idCliente, datosActualizados, { new: true });
 		}
 	}
-};
+}
 
 export default helpersClientes;

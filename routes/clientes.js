@@ -16,6 +16,7 @@ router.get("/",
     validarJWT
   ],
   httpClientes.getClientes
+  
 );
 
 router.get('/activos',
@@ -63,7 +64,7 @@ router.get('/plan/:plan',
 
 router.get('/cumpleanos/:fecha',
   [
-    check('fecha', 'La fecha debe ser una fecha válida').isISO8601().toDate(),
+    check('fecha', 'La fecha debe ser una fecha válida').toDate(),
     check('fecha').custom(helpersClientes.getFechaCumpleaños),
     validarCampos,
     validarJWT
@@ -73,7 +74,7 @@ router.get('/cumpleanos/:fecha',
 
 router.get('/ingresaron/:fecha',
   [
-    check('fecha', 'La fecha debe ser una fecha válida').isISO8601().toDate(),
+    check('fecha', 'La fecha debe ser una fecha válida').toDate(),
     check('fecha').custom(helpersClientes.getClientesIngresaron),
     validarCampos,
     validarJWT
@@ -113,15 +114,15 @@ router.put('/:id',
       await helpersClientes.putId(idCliente, req.body);
     }),
     check('nombre', 'El nombre no pueden estar vacío').optional().trim(),
-    check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().toDate(),
     check('documento').optional().trim().custom((documento, { req }) => helpersClientes.putDocumento(documento, req.params.id)),
-    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().toDate(),
     check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isNumeric(),
     check('objetivo', 'El objetivo no pueden estar vacío').optional().trim(),
     check('observaciones', 'Las observaciones no pueden estar vacío').optional().trim(),
     check('plan', 'El plan no pueden estar vacío').optional().trim(),
     check('fechaVencimiento', 'La fecha de Vencimiento debe estar en formato ISO8601').optional().toDate(),
-    check('seguimiento.*.fecha', 'La fecha del Seguimiento debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('seguimiento.*.fecha', 'La fecha del Seguimiento debe estar en formato ISO8601').optional().toDate(),
     check('seguimiento').optional().isArray().withMessage('Seguimiento debe ser un array'),
     check('seguimiento.*.peso').optional().isNumeric().withMessage('El campo peso debe ser un número válido'),
     check('seguimiento.*.brazo').optional().isNumeric().withMessage('El campo brazo debe ser un número válido'),

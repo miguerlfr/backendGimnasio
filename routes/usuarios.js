@@ -3,6 +3,7 @@ import httpUsuarios from '../controllers/usuarios.js';
 import { check } from 'express-validator';
 import helpersUsuarios from '../helpers/usuarios.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
+import { validarJWTPassword } from '../middlewares/validar-jwt.js';
 import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
@@ -99,6 +100,23 @@ router.put('/inactivar/:id',
     validarJWT
   ],
   httpUsuarios.putUsuariosInactivar
+);
+
+router.put('/restablecer/contrasena',
+  [
+    // check('email', 'El correo electrónico es requerido y debe ser válido.').notEmpty().isEmail(),
+    validarCampos
+  ],
+  httpUsuarios.recuperarContrasena
+);
+
+router.put('/notificacion/token',
+  validarJWTPassword,
+  httpUsuarios.contraseñaCambiada
+)
+
+router.put('/cambiar/contrasena',
+  httpUsuarios.putUsuariosContrasena
 );
 
 export default router;

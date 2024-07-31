@@ -1,6 +1,7 @@
 import Usuario from '../models/usuarios.js';
 import bcryptjs from 'bcryptjs';
-import { generarJWT } from '../middlewares/validar-jwt.js'
+import { generarJWT, generarJWTPassword } from '../middlewares/validar-jwt.js'
+import { enviarEmailRecuperacion } from "../middlewares/email.js";
 
 const httpUsuarios = {
 	getUsuarios: async (req, res) => {
@@ -39,7 +40,7 @@ const httpUsuarios = {
 			}
 
 			// // Verificación del rol del usuario
-			// if (user.rol !== 'Admin' || user.rol !== 'Recepcionista' || user.rol !== 'User') {
+			// if (user.rol !== 'Administrador' || user.rol !== 'Recepcionista' || user.rol !== 'Usuario') {
 			// 	return res.status(401).json({
 			// 		msg: 'No tienes permisos para iniciar sesión.',
 			// 	});
@@ -69,23 +70,23 @@ const httpUsuarios = {
 	},
 	postUsuarios: async (req, res) => {
 		try {
-					const { sede, nombre, email, telefono, password, rol, estado } =
-			req.body;
-		const usuario = new Usuario({
-			sede,
-			nombre,
-			email,
-			telefono,
-			password,
-			rol,
-			estado
-		});
-		const salt = bcryptjs.genSaltSync();
-		usuario.password = bcryptjs.hashSync(password, salt);
-		await usuario.save();
-		res.json({
-			usuario
-		});
+			const { sede, nombre, email, telefono, password, rol, estado } =
+				req.body;
+			const usuario = new Usuario({
+				sede,
+				nombre,
+				email,
+				telefono,
+				password,
+				rol,
+				estado
+			});
+			const salt = bcryptjs.genSaltSync();
+			usuario.password = bcryptjs.hashSync(password, salt);
+			await usuario.save();
+			res.json({
+				usuario
+			});
 		} catch (error) {
 			// Manejar errores
 			console.log("error:", error);
@@ -142,6 +143,62 @@ const httpUsuarios = {
 		);
 		res.json({ usuario });
 	},
+	recuperarContrasena: async (req, res) => {
+		const { email } = req.body;
+		console.log("Email recibido para recuperación:", email); // Agrega este log
+		try {
+			const user = await Usuario.findOne({ email });
+			console.log("Usuario encontrado:", user); // Agrega este log
+			if (!user) {
+				return res.status(404).json({ msg: 'Usuario no encontrado' });
+			}
+
+			const token = await generarJWTPassword(user._id);
+			await enviarEmailRecuperacion(email, token);
+
+			res.json({ msg: 'Correo de recuperación enviado' });
+		} catch (error) {
+			console.error("Error en la función recuperarContrasena:", error);
+			res.status(500).json({ msg: 'Error de servidor' });
+		}
+	},
+	contraseñaCambiada: async (req, res) => {
+		try {
+			const user = req.usuariodbtoken;
+			res.json({
+				msg: "Operacion realizada con exito",
+				usuario: user
+			})
+
+		} catch (error) {
+			res.json({ msg: 'Error de servidorr' })
+		}
+	},
+	putUsuariosContrasena: async (req, res) => {
+		try {
+			const { id } = req.params;
+			const { nuevaContrasenia } = req.body;
+	
+			// Validar que la nueva contraseña no esté vacía
+			if (!nuevaContrasenia) {
+				return res.status(400).json({ msg: 'La nueva contraseña es requerida' });
+			}
+	
+			// Encriptar la nueva contraseña
+			const salt = bcryptjs.genSaltSync();
+			const encriptada = bcryptjs.hashSync(nuevaContrasenia, salt);
+	
+			// Actualizar la contraseña del usuario
+			const usuario = await Usuario.findByIdAndUpdate(id, { password: encriptada }, { new: true });
+	
+			res.json({ msg: 'Contraseña actualizada correctamente', usuario });
+	
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Error en el servidor" });
+		}
+	}
+	
 };
 
 export default httpUsuarios;

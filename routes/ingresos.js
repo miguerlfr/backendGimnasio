@@ -27,9 +27,9 @@ router.get('/:id',
 router.get('/fechas/:fechaInicio/:fechaFin',
   [
     check('fechaInicio', 'La fecha de inicio es requerida.').notEmpty(),
-    check('fechaInicio', 'La fecha de inicio debe ser una fecha válida.').isISO8601().toDate(),
+    check('fechaInicio', 'La fecha de inicio debe ser una fecha válida.').toDate(),
     check('fechaFin', 'La fecha de fin es requerida.').notEmpty(),
-    check('fechaFin', 'La fecha de fin debe ser una fecha válida.').isISO8601().toDate(),
+    check('fechaFin', 'La fecha de fin debe ser una fecha válida.').toDate(),
     validarCampos,
     validarJWT
   ],
@@ -57,7 +57,7 @@ router.put('/:id',
     check('id').custom(async (idIngreso, { req }) => {
       await helpersIngresos.putId(idIngreso, req.body);
     }),
-    check('fecha', 'La fecha debe estar en formato ISO8601').optional().isISO8601().toDate(),
+    check('fecha', 'La fecha debe estar en formato ISO8601').optional().toDate(),
     check('sede').custom(helpersIngresos.postPutSede).optional(),
     // check('sede', 'Se necesita que en el campo de sede haya un mongoId válido').isMongoId().optional(),
     // check('sede').custom((sede, { req }) => helpersIngresos.postSedeCliente(sede, req.body.cliente)).optional(),

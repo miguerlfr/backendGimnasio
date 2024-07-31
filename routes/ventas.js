@@ -27,9 +27,9 @@ router.get('/:id',
 router.get('/fechas/:fechaInicio/:fechaFin',
   [
     check('fechaInicio', 'La fecha de inicio es requerida.').notEmpty(),
-    check('fechaInicio', 'La fecha de inicio debe ser una fecha válida.').isISO8601().toDate(),
+    check('fechaInicio', 'La fecha de inicio debe ser una fecha válida.').toDate(),
     check('fechaFin', 'La fecha de fin es requerida.').notEmpty(),
-    check('fechaFin', 'La fecha de fin debe ser una fecha válida.').isISO8601().toDate(),
+    check('fechaFin', 'La fecha de fin debe ser una fecha válida.').toDate(),
     validarCampos,
     validarJWT
   ], httpVentas.getVentasFechas
@@ -56,7 +56,7 @@ router.put('/:id',
     check('id').custom(async (idVenta, { req }) => {
       await helpersVentas.putId(idVenta, req.body);
     }),
-    check('fecha', 'La fecha debe estar en formato válido').optional().isISO8601().toDate(),
+    check('fecha', 'La fecha debe estar en formato válido').optional().toDate(),
     check('id').custom(async (idVenta, { req }) => {
       await helpersVentas.actualizarVenta(idVenta, req.body);
     }),

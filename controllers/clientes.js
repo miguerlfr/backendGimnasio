@@ -161,7 +161,7 @@ const httpClientes = {
 
 			const camposActualizables = {
 				nombre,
-				fechaIngreso,
+				fechaIngreso: new Date(fechaIngreso),
 				documento,
 				fechaNacimiento,
 				edad: new Date().getFullYear() - new Date(fechaNacimiento).getFullYear(),
