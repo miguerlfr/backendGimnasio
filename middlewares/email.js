@@ -16,7 +16,7 @@ export const enviarEmailRecuperacion = async (email, token) => {
     from: 'luismiguelvargasjaimes@gmail.com',
     to: email,
     subject: 'Recuperación de contraseña',
-    text: `Utiliza el siguiente enlace para restablecer tu contraseña: \nhttps://frontend-gimnasio.vercel.app/#/restablecer-contrasena?tokenP=${token}`,
+    text: `Utiliza el siguiente enlace para restablecer tu contraseña: \nhttps://frontend-gimnasio.vercel.app/#/restablecer/contrasena?tokenP=${token}`,
   };
 
   try {
