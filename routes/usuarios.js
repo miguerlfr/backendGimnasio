@@ -105,7 +105,6 @@ router.put('/inactivar/:id',
 router.put('/restablecer/contrasena',
   [
     // check('email', 'El correo electrónico es requerido y debe ser válido.').notEmpty().isEmail(),
-    validarCampos
   ],
   httpUsuarios.recuperarContrasena
 );
