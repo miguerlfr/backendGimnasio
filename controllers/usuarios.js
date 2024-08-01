@@ -176,12 +176,11 @@ const httpUsuarios = {
 	},
 	putUsuariosContrasena: async (req, res) => {
 		try {
-			const { id } = req.params;
-			const { nuevaContrasenia } = req.body;
+			const { id, nuevaContrasenia } = req.body;
 	
-			// Validar que la nueva contraseña no esté vacía
-			if (!nuevaContrasenia) {
-				return res.status(400).json({ msg: 'La nueva contraseña es requerida' });
+			// Validar que el ID y la nueva contraseña no estén vacíos
+			if (!id || !nuevaContrasenia) {
+				return res.status(400).json({ msg: 'El ID y la nueva contraseña son requeridos' });
 			}
 	
 			// Encriptar la nueva contraseña

@@ -114,7 +114,7 @@ router.put('/notificacion/token',
   httpUsuarios.contraseñaCambiada
 )
 
-router.put('/cambiar/contrasena/:id',
+router.put('/cambiar/contrasena',
   httpUsuarios.putUsuariosContrasena
 );
 
