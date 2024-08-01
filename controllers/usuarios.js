@@ -175,44 +175,30 @@ const httpUsuarios = {
 		}
 	},
 	putUsuariosContrasena: async (req, res) => {
-		const { _id, nuevaContrasenia } = req.body;
-
 		try {
-			console.log("Buscando usuario con ID:", _id);
-			// Encuentra el usuario por ID
-			const usuario = await User.findById(_id);
-			if (!usuario) {
-				console.log("Usuario no encontrado");
-				return res.status(404).json({
-					msg: 'Usuario no encontrado',
-				});
-			}
-
+			const { id } = req.params;
+			const { nuevaContrasenia } = req.body;
+	
 			// Validar que la nueva contraseña no esté vacía
 			if (!nuevaContrasenia) {
-				console.log("La nueva contraseña es requerida");
 				return res.status(400).json({ msg: 'La nueva contraseña es requerida' });
 			}
-
+	
 			// Encriptar la nueva contraseña
-			console.log("Encriptando nueva contraseña");
 			const salt = bcryptjs.genSaltSync();
 			const encriptada = bcryptjs.hashSync(nuevaContrasenia, salt);
-
+	
 			// Actualizar la contraseña del usuario
-			console.log("Actualizando contraseña para el usuario con ID:", _id);
-			const usuarioActualizado = await User.findByIdAndUpdate(_id, { password: encriptada }, { new: true });
-
-			if (usuarioActualizado) {
-				console.log("Contraseña actualizada correctamente para el usuario:", usuarioActualizado);
-				res.json({ msg: 'Contraseña actualizada correctamente', usuario: usuarioActualizado });
-			} else {
-				console.log("Error al actualizar la contraseña");
-				res.status(500).json({ error: "Error al actualizar la contraseña" });
+			const usuario = await Usuario.findByIdAndUpdate(id, { password: encriptada }, { new: true });
+	
+			if (!usuario) {
+				return res.status(404).json({ msg: 'Usuario no encontrado' });
 			}
-
+	
+			res.json({ msg: 'Contraseña actualizada correctamente', usuario });
+	
 		} catch (error) {
-			console.log("Error en el servidor:", error.message);
+			console.log('Error en el servidor:', error.message);
 			res.status(500).json({ error: "Error en el servidor" });
 		}
 	}
