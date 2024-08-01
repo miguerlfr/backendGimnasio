@@ -176,29 +176,33 @@ const httpUsuarios = {
 	},
 	putUsuariosContrasena: async (req, res) => {
 		try {
-			const { id } = req.params;
-			const { nuevaContrasenia } = req.body;
-	
+			// Encuentra el usuario por ID
+			const usuario = await User.findById(_id);
+			if (!usuario) {
+				return res.status(404).json({
+					msg: 'Usuario no encontrado',
+				});
+			}
+
 			// Validar que la nueva contraseña no esté vacía
 			if (!nuevaContrasenia) {
 				return res.status(400).json({ msg: 'La nueva contraseña es requerida' });
 			}
-	
+
 			// Encriptar la nueva contraseña
 			const salt = bcryptjs.genSaltSync();
 			const encriptada = bcryptjs.hashSync(nuevaContrasenia, salt);
-	
+
 			// Actualizar la contraseña del usuario
-			const usuario = await Usuario.findByIdAndUpdate(id, { password: encriptada }, { new: true });
-	
-			res.json({ msg: 'Contraseña actualizada correctamente', usuario });
-	
+			const usuarioActualizado = await User.findByIdAndUpdate(_id, { password: encriptada }, { new: true });
+
+			res.json({ msg: 'Contraseña actualizada correctamente', usuario: usuarioActualizado });
+
 		} catch (error) {
 			console.log(error);
 			res.status(500).json({ error: "Error en el servidor" });
 		}
 	}
-	
 };
 
 export default httpUsuarios;
