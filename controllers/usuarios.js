@@ -176,7 +176,8 @@ const httpUsuarios = {
 	},
 	putUsuariosContrasena: async (req, res) => {
 		try {
-			const { id, nuevaContrasenia } = req.body;
+			const { id } = req.params;
+			const { nuevaContrasenia } = req.body;
 	
 			// Validar que la nueva contraseña no esté vacía
 			if (!nuevaContrasenia) {
