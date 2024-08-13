@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Producto from "../models/productos.js";
 
-const ventaSchema = new mongoose.Schema({
+const compraSchema = new mongoose.Schema({
     codigoProducto: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Producto",
@@ -9,13 +9,13 @@ const ventaSchema = new mongoose.Schema({
     },
     valorUnitario: { type: Number },
     cantidad: { type: Number, required: true },
-    valorTotal: { type: Number },
+    valorTotal: { type: Number }
 }, {
     timestamps: true
 });
 
 // Middleware para calcular valorTotal antes de guardar
-ventaSchema.pre('save', async function (next) {
+compraSchema.pre('save', async function (next) {
     try {
         // Buscar el producto solo si se ha modificado el código de producto
         if (this.isModified('codigoProducto')) {
@@ -38,9 +38,7 @@ ventaSchema.pre('save', async function (next) {
     }
 });
 
-export default mongoose.model("Venta", ventaSchema);
-
-// Se necesitan crear Productos primero
+export default mongoose.model("Compra", compraSchema);
 
 // {
 //   "codigoProducto": "PROD1",

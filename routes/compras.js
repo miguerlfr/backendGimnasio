@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import httpVentas from '../controllers/ventas.js';
+import httpCompras from '../controllers/compras.js';
 import { check } from 'express-validator';
-import helpersVentas from '../helpers/ventas.js';
+import helpersCompras from '../helpers/compras.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
 // import { validarJWT } from '../middlewares/validar-jwt.js';
 
@@ -12,7 +12,7 @@ router.get('/',
     validarCampos,
     // validarJWT
   ],
-  httpVentas.getVentas
+  httpCompras.getCompras
 );
 
 router.get('/:id',
@@ -21,7 +21,7 @@ router.get('/:id',
     validarCampos,
     // validarJWT
   ],
-  httpVentas.getVentasID
+  httpCompras.getComprasID
 );
 
 router.get('/fechas/:fechaInicio/:fechaFin',
@@ -32,36 +32,36 @@ router.get('/fechas/:fechaInicio/:fechaFin',
     check('fechaFin', 'La fecha de fin debe ser una fecha válida.').toDate(),
     validarCampos,
     // validarJWT
-  ], httpVentas.getVentasFechas
+  ], httpCompras.getComprasFechas
 );
 
 router.post('/',
   [
     check('codigoProducto', 'El Producto es requerido').notEmpty(),
     check('codigoProducto').custom(async (codigoProducto, { req }) => {
-      await helpersVentas.postCodigoPto(codigoProducto, req.body.valorUnitario, req.body.cantidad);
+      await helpersCompras.postCodigoPto(codigoProducto, req.body.valorUnitario, req.body.cantidad);
     }),
     check('cantidad', 'La cantidad es requerida y debe ser numérico').notEmpty().isNumeric(),
     validarCampos,
     // validarJWT
   ],
-  httpVentas.postVentas
+  httpCompras.postCompras
 );
 
 router.put('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
-    check('id').custom(async (idVenta, { req }) => {
-      await helpersVentas.putId(idVenta, req.body);
+    check('id').custom(async (idCompra, { req }) => {
+      await helpersCompras.putId(idCompra, req.body);
     }),
-    check('id').custom(async (idVenta, { req }) => {
-      await helpersVentas.actualizarVenta(idVenta, req.body);
+    check('id').custom(async (idCompra, { req }) => {
+      await helpersCompras.actualizarCompra(idCompra, req.body);
     }),
     check('cantidad', 'La cantidad debe ser numérico').optional().isNumeric(),
     validarCampos,
     // validarJWT
   ],
-  httpVentas.putVentas
+  httpCompras.putCompras
 );
 
 export default router;

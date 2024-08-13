@@ -70,74 +70,29 @@ const httpClientes = {
 	postClientes: async (req, res) => {
 		try {
 			console.log("req.body:", req.body);
-			let { nombre, fechaIngreso, documento, fechaNacimiento, edad, direccion, telefono, objetivo, observaciones, estado, plan, fechaVencimiento, seguimiento } = req.body;
-
-			console.log("seguimiento:", seguimiento);
-
-			// Calcular el IMC y su clasificación si el peso y la estatura están disponibles
-			if (seguimiento && seguimiento.length > 0) {
-				seguimiento.forEach((seg) => {
-					// Verificar que el peso y la estatura sean números válidos
-					const peso = parseFloat(seg.peso);
-					const estatura = parseFloat(seg.estatura);
-
-					if (!isNaN(peso) && !isNaN(estatura)) {
-						const estaturaTotal = estatura / 100;
-
-						if (estaturaTotal > 0) {
-							// Calcular el IMC
-							seg.imc = peso / estaturaTotal ** 2;
-
-							// Clasificar el IMC
-							if (seg.imc < 18.5) {
-								seg.estadoIMC = "Bajo peso";
-							} else if (seg.imc >= 18.5 && seg.imc < 24.9) {
-								seg.estadoIMC = "Normal";
-							} else if (seg.imc >= 25 && seg.imc < 29.9) {
-								seg.estadoIMC = "Sobrepeso";
-							} else if (seg.imc >= 30 && seg.imc < 34.9) {
-								seg.estadoIMC = "Obesidad 1";
-							} else if (seg.imc >= 35 && seg.imc < 39.9) {
-								seg.estadoIMC = "Obesidad 2";
-							} else if (seg.imc >= 40) {
-								seg.estadoIMC = "Obesidad 3";
-							}
-						} else {
-							console.error(`Estatura inválida para el seguimiento: ${seg.estatura}`);
-						}
-					} else {
-						console.error(`Datos inválidos para el seguimiento: Peso - ${seg.peso}, Estatura - ${seg.estatura}`);
-					}
-				});
-			}
-
-			// Obtener el plan para calcular la fecha de vencimiento
-			const planData = await Plane.findById(plan);
-			// console.log("plan", plan);
-			if (!planData) {
-				throw new Error("Plan no encontrado");
-			}
-
-			// Crear un nuevo cliente con las fechas parseadas y los datos recibidos
+			let { nombre, fechaIngreso, documento, fechaNacimiento, direccion, email, objetivo, observaciones, estado, plan, seguimiento } = req.body;
+	
+			// Crear un nuevo cliente con los datos recibidos
 			const cliente = new Cliente({
 				nombre,
 				fechaIngreso: new Date(fechaIngreso),
 				documento,
 				fechaNacimiento: new Date(fechaNacimiento),
-				edad: new Date().getFullYear() - new Date(fechaNacimiento).getFullYear(),
 				direccion,
-				telefono,
+				email,
 				objetivo,
 				observaciones,
 				estado,
 				plan,
-				fechaVencimiento: new Date(new Date(fechaIngreso).setDate(new Date(fechaIngreso).getDate() + planData.dias)), // Usar la fecha calculada
 				seguimiento,
 			});
-
+	
+			// Calcular el IMC y su clasificación
+			cliente.calcularIMC();
+	
 			// Guardar el cliente en la base de datos
 			await cliente.save();
-
+	
 			console.log("cliente", cliente);
 			// Enviar respuesta con el cliente creado
 			res.json({ cliente });
@@ -150,82 +105,65 @@ const httpClientes = {
 	putClientes: async (req, res) => {
 		try {
 			const { id } = req.params;
-			let { nombre, fechaIngreso, documento, fechaNacimiento, edad, direccion, telefono, objetivo, observaciones, plan, fechaVencimiento, seguimiento } = req.body;
-
-			// Obtener el plan para calcular la fecha de vencimiento
-			const planData = await Plane.findById(plan);
-			// console.log("plan", plan);
-			if (!planData) {
-				throw new Error("Plan no encontrado");
+	
+			// Verifica si el id está presente
+			if (!id) {
+				return res.status(400).json({ error: "ID del cliente es requerido" });
 			}
-
+	
+			let { nombre, fechaIngreso, documento, fechaNacimiento, direccion, email, objetivo, observaciones, plan, seguimiento } = req.body;
+	
+			// Verificar si el plan se proporcionó y si existe
+			if (plan) {
+				const planData = await Plane.findById(plan);
+				if (!planData) {
+					throw new Error("Plan no encontrado");
+				}
+			}
+	
+			// Campos actualizables del cliente
 			const camposActualizables = {
 				nombre,
-				fechaIngreso: new Date(fechaIngreso),
+				fechaIngreso: fechaIngreso ? new Date(fechaIngreso) : undefined,
 				documento,
-				fechaNacimiento,
-				edad: new Date().getFullYear() - new Date(fechaNacimiento).getFullYear(),
+				fechaNacimiento: fechaNacimiento ? new Date(fechaNacimiento) : undefined,
 				direccion,
-				telefono,
+				email,
 				objetivo,
 				observaciones,
 				plan,
-				fechaVencimiento: new Date(new Date(fechaIngreso).setDate(new Date(fechaIngreso).getDate() + planData.dias)),
 				seguimiento,
 			};
-
+	
+			// Filtrar campos indefinidos
+			Object.keys(camposActualizables).forEach(key => {
+				if (camposActualizables[key] === undefined) {
+					delete camposActualizables[key];
+				}
+			});
+	
 			if (Object.keys(camposActualizables).length === 0) {
 				return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });
 			}
-
-			// Calcular el IMC y su clasificación si el peso y la estatura están disponibles
-			if (seguimiento && seguimiento.length > 0) {
-				seguimiento.forEach((seg) => {
-					// Verificar que el peso y la estatura sean números válidos
-					const peso = parseFloat(seg.peso);
-					const estatura = parseFloat(seg.estatura);
-
-					if (!isNaN(peso) && !isNaN(estatura)) {
-						const estaturaTotal = estatura / 100;
-
-						if (estaturaTotal > 0) {
-							// Calcular el IMC
-							seg.imc = peso / estaturaTotal ** 2;
-
-							// Clasificar el IMC
-							if (seg.imc < 18.5) {
-								seg.estadoIMC = "Bajo peso";
-							} else if (seg.imc >= 18.5 && seg.imc < 24.9) {
-								seg.estadoIMC = "Normal";
-							} else if (seg.imc >= 25 && seg.imc < 29.9) {
-								seg.estadoIMC = "Sobrepeso";
-							} else if (seg.imc >= 30 && seg.imc < 34.9) {
-								seg.estadoIMC = "Obesidad 1";
-							} else if (seg.imc >= 35 && seg.imc < 39.9) {
-								seg.estadoIMC = "Obesidad 2";
-							} else if (seg.imc >= 40) {
-								seg.estadoIMC = "Obesidad 3";
-							}
-						} else {
-							console.error(`Estatura inválida para el seguimiento: ${seg.estatura}`);
-						}
-					} else {
-						console.error(`Datos inválidos para el seguimiento: Peso - ${seg.peso}, Estatura - ${seg.estatura}`);
-					}
-				});
-			}
-
+	
+			// Actualizar el cliente
 			const clienteActualizado = await Cliente.findByIdAndUpdate(id, camposActualizables, { new: true });
+	
 			if (!clienteActualizado) {
 				return res.status(404).json({ error: "ID del Cliente no encontrado" });
 			}
+	
+			// Calcular IMC después de la actualización
+			clienteActualizado.calcularIMC();
+			await clienteActualizado.save();
+	
 			res.json(clienteActualizado);
 		} catch (error) {
 			// Manejar errores
 			console.log("error:", error);
 			res.status(400).json({ error: `No se pudo editar el cliente ${error.message}` });
 		}
-	},
+	},	
 	putClientesActivar: async (req, res) => {
 		const { id } = req.params;
 		const clientes = await Cliente.findByIdAndUpdate(id, { estado: 1 }, { new: true });

@@ -55,7 +55,7 @@ router.get('/seguimiento/:id',
 
 router.get('/plan/:plan',
   [
-    check('plan').custom(helpersClientes.getPlan),
+    // check('plan').custom(helpersClientes.getPlan),
     validarCampos,
     validarJWT
   ],
@@ -87,8 +87,9 @@ router.post('/',
     check('nombre', 'El nombre es requerido y no puede estar vacío').trim().notEmpty(),
     check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().toDate(), //Fechas no necesitan trim
     check('documento').custom(helpersClientes.postDocumento).optional(),
-    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().toDate(),
-    check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isNumeric(),
+    check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().toDate(),    
+    check('email', 'El email es requerido y debe ser válido').notEmpty().isEmail(),
+    check('email').custom(helpersClientes.postEmail).optional(),
     check('observaciones', 'Las observaciones no pueden estar vacío').optional().trim(),
     check('objetivo', 'El objetivo es requerido y no puede estar vacío').trim().notEmpty(),
     check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
@@ -110,14 +111,14 @@ router.post('/',
 router.put('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
-    check('id').custom(async (idCliente, { req }) => {
-      await helpersClientes.putId(idCliente, req.body);
+    check('id').custom(async (id, { req }) => {
+      await helpersClientes.putId(id, req.body);
     }),
     check('nombre', 'El nombre no pueden estar vacío').optional().trim(),
     check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().toDate(),
     check('documento').optional().trim().custom((documento, { req }) => helpersClientes.putDocumento(documento, req.params.id)),
     check('fechaNacimiento', 'La fecha de Nacimiento debe estar en formato ISO8601').optional().toDate(),
-    check("telefono", "El teléfono debe ser un número de teléfono móvil válido").optional().isNumeric(),
+    check('email').optional().trim().custom((email, { req }) => helpersClientes.putEmail(email, req.params.id)),
     check('objetivo', 'El objetivo no pueden estar vacío').optional().trim(),
     check('observaciones', 'Las observaciones no pueden estar vacío').optional().trim(),
     check('plan', 'El plan no pueden estar vacío').optional().trim(),

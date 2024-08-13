@@ -9,8 +9,9 @@ const maquinaSchema = new mongoose.Schema({
     },
     descripcion: { type: String },
     fechaIngreso: { type: Date, required: true },
-    fechaUltMan: { type: Date },
     estado: { type: Number }
+}, {
+    timestamps: true
 });
 
 export default mongoose.model('Maquina', maquinaSchema);
@@ -21,22 +22,19 @@ export default mongoose.model('Maquina', maquinaSchema);
 //     "codigo": "MAQ1",
 //     "sede": "Sede A",
 //     "descripcion": "Máquina de prensa",
-//     "fechaIngreso": "2000-01-05T00:00:00.000Z",
-//     "fechaUltMan": "2000-05-25T00:00:00.000Z"
+//     "fechaIngreso": "2000-01-05T00:00:00.000Z"
 // }
 
 // {
 //     "codigo": "MAQ2",
 //     "sede": "Sede B",
 //     "descripcion": "Máquina de banca",
-//     "fechaIngreso": "2024-02-10T00:00:00.000Z",
-//     "fechaUltMan": "2000-05-25T00:00:00.000Z"
+//     "fechaIngreso": "2024-02-10T00:00:00.000Z"
 // }
 
 // {
 //     "codigo": "MAQ3",
 //     "sede": "Sede C",
 //     "descripcion": "Máquina de dominadas",
-//     "fechaIngreso": "2000-04-20T00:00:00.000Z",
-//     "fechaUltMan": "2000-05-25T00:00:00.000Z"
+//     "fechaIngreso": "2000-04-20T00:00:00.000Z"
 // }

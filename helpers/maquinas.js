@@ -49,14 +49,6 @@ const helpersMaquinas = {
                 valorActualizado = valorActualizado.split('T')[0]; // Eliminar la parte "T00:00:00.000Z"
             }
 
-			if (key === 'fechaUltMan' && valorActual instanceof Date) {
-                valorActual = valorActual.toISOString().split('T')[0]; // Eliminar la parte "T00:00:00.000Z"
-            }
-
-            if (key === 'fechaUltMan' && typeof valorActualizado === 'string') {
-                valorActualizado = valorActualizado.split('T')[0]; // Eliminar la parte "T00:00:00.000Z"
-            }
-
             // Convertir valores a cadena para comparación
             const valorActualStr = (valorActual || '').toString();
             const valorActualizadoStr = (valorActualizado || '').toString();

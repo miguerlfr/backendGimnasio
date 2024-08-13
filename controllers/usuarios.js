@@ -2,6 +2,7 @@ import Usuario from '../models/usuarios.js';
 import bcryptjs from 'bcryptjs';
 import { generarJWT, generarJWTPassword } from '../middlewares/validar-jwt.js'
 import { enviarEmailRecuperacion } from "../middlewares/email.js";
+import jwt from 'jsonwebtoken';
 
 const httpUsuarios = {
 	getUsuarios: async (req, res) => {
@@ -145,10 +146,10 @@ const httpUsuarios = {
 	},
 	recuperarContrasena: async (req, res) => {
 		const { email } = req.body;
-		console.log("Email recibido para recuperación:", email); // Agrega este log
+		console.log("Email recibido para recuperación:", email);
 		try {
 			const user = await Usuario.findOne({ email });
-			console.log("Usuario encontrado:", user); // Agrega este log
+			console.log("Usuario encontrado:", user);
 			if (!user) {
 				return res.status(404).json({ msg: 'Usuario no encontrado' });
 			}

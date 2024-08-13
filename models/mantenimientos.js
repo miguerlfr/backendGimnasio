@@ -24,7 +24,6 @@ export default mongoose.model("Mantenimiento", mantenimientoSchema);
 //     "responsable": "Jose",
 //     "precio": 10000
 // }
-
 // {
 //     "idMaquina": "66515781cfdf1d85c2badde5",
     // "fecha": "2000-05-26T00:00:00.000Z",
@@ -32,7 +31,6 @@ export default mongoose.model("Mantenimiento", mantenimientoSchema);
 //     "responsable": "Victor",
 //     "precio": 20000
 // }
-
 // {
 //     "idMaquina": "6651578bcfdf1d85c2badde9",
 //     "fecha": "2000-05-27T00:00:00.000Z",

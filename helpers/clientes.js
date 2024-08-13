@@ -20,6 +20,14 @@ let helpersClientes = {
 		} else if (existe) {
 			throw new Error(`El documento ${documento} ya está en la base de datos, digitar un documento diferente por favor`);
 		}
+	},	
+	postEmail: async (email) => {
+		const existe = await Cliente.findOne({ email });
+		if (!email) {
+			throw new Error("El email es requerido");
+		} else if (existe) {
+			throw new Error(`El email ${email} ya está en la base de datos, digitar un email diferente por favor`);
+		}
 	},
 	putDocumento: async (documento, id) => {
 		let documentoUnico = await Cliente.findOne({ documento, _id: { $ne: id } });
@@ -29,14 +37,22 @@ let helpersClientes = {
 			throw new Error(`El documento ${documento} ya está en la base de datos, digitar un documento diferente por favor`);
 		}
 	},
+	putEmail: async (email, id) => {
+		const buscar = await Cliente.findOne({ email, _id: { $ne: id } });
+		if (!email) {
+			throw new Error("El email es requerido");
+		} else if (buscar) {
+			throw new Error(`El email ${email} ya está en la base de datos, digitar un email diferente por favor`);
+		}
+	},
 	putId: async (idCliente, datosActualizados) => {
 		const clienteActual = await Cliente.findById(idCliente);
 		if (!clienteActual) {
 			throw new Error("Cliente no encontrado");
 		}
-
-		console.log("Cliente Actual Completo:", JSON.stringify(clienteActual, null, 2));
-		console.log("Datos Actualizados:", JSON.stringify(datosActualizados, null, 2));
+		
+		// console.log("Cliente Actual Completo:", JSON.stringify(clienteActual, null, 2));
+		// console.log("Datos Actualizados:", JSON.stringify(datosActualizados, null, 2));
 
 		const normalizarFecha = (fecha) => {
 			if (!fecha) return null;
@@ -77,8 +93,8 @@ let helpersClientes = {
 		const seguimientoActual = simplificarSeguimiento(clienteActual.seguimiento);
 		const seguimientoActualizado = datosActualizados.seguimiento ? simplificarSeguimiento(datosActualizados.seguimiento) : [];
 
-		console.log("Seguimiento Actual Simplificado:", seguimientoActual);
-		console.log("Nuevo Seguimiento Simplificado:", seguimientoActualizado);
+		// console.log("Seguimiento Actual Simplificado:", seguimientoActual);
+		// console.log("Nuevo Seguimiento Simplificado:", seguimientoActualizado);
 
 		const normalizarFechasEnObjeto = (obj) => {
 			Object.keys(obj).forEach(key => {
@@ -107,16 +123,27 @@ let helpersClientes = {
 					return;
 				}
 				if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
-					const diffs = encontrarDiferencias(obj1[key][0], obj2[key][0]);
-					if (Object.keys(diffs).length > 0) {
-						diferencias[key] = diffs;
+					// Verifica que los arrays tengan la misma longitud
+					if (obj1[key].length !== obj2[key].length) {
+						diferencias[key] = { valorActual: obj1[key], valorActualizado: obj2[key] };
+					} else {
+						// Compara cada elemento del array
+						obj1[key].forEach((item, index) => {
+							const diffs = encontrarDiferencias(item, obj2[key][index]);
+							if (Object.keys(diffs).length > 0) {
+								if (!diferencias[key]) {
+									diferencias[key] = [];
+								}
+								diferencias[key][index] = diffs;
+							}
+						});
 					}
 				} else {
 					const valorActual = obj1[key];
 					const valorActualizado = obj2[key];
 					const valorActualNormalizado = key.includes('fecha') ? normalizarFecha(valorActual) : valorActual;
 					const valorActualizadoNormalizado = key.includes('fecha') ? normalizarFecha(valorActualizado) : valorActualizado;
-
+		
 					if (valorActualNormalizado !== valorActualizadoNormalizado) {
 						if (obj1[key] instanceof ObjectId && obj2[key] === obj1[key].toString()) {
 							return;
@@ -127,9 +154,10 @@ let helpersClientes = {
 			});
 			return diferencias;
 		};
+		
 
 		const diferencias = encontrarDiferencias(clienteActual.toObject(), datosActualizados);
-		console.log('Diferencias encontradas:', diferencias);
+		// console.log('Diferencias encontradas:', diferencias);
 
 		const cambiosEnCamposClaveSeguimiento = Object.values(diferencias).some(dif => {
 			if (typeof dif === 'object' && dif !== null) {
@@ -141,27 +169,27 @@ let helpersClientes = {
 			return false;
 		});
 
-		console.log('cambiosEnCamposClaveSeguimiento:', cambiosEnCamposClaveSeguimiento);
+		// console.log('cambiosEnCamposClaveSeguimiento:', cambiosEnCamposClaveSeguimiento);
 
 		const hayDiferenciasAdicionales = Object.keys(datosActualizados).some(key => {
 			if (key === 'seguimiento') return false;
 			const valorActual = clienteActual[key] ? clienteActual[key].toString() : '';
 			const valorActualizado = datosActualizados[key] ? datosActualizados[key].toString() : '';
 			const esDiferente = valorActual !== valorActualizado;
-			console.log(`Revisando campo: ${key}, valor actual: ${valorActual}, valor actualizado: ${valorActualizado}, es diferente: ${esDiferente}`);
+			// console.log(`Revisando campo: ${key}, valor actual: ${valorActual}, valor actualizado: ${valorActualizado}, es diferente: ${esDiferente}`);
 			return esDiferente;
 		});
 
-		console.log('hayDiferenciasAdicionales:', hayDiferenciasAdicionales);
+		// console.log('hayDiferenciasAdicionales:', hayDiferenciasAdicionales);
 
 		const datosIguales = Object.keys(diferencias).length === 0 && !hayDiferenciasAdicionales;
-		console.log('Datos Iguales:', datosIguales);
+		// console.log('Datos Iguales:', datosIguales);
 
 		if (datosIguales) {
-			console.log("Ningún cambio proporcionado para editar.");
+			// console.log("Ningún cambio proporcionado para editar.");
 			throw new Error("Ningún cambio proporcionado para editar.");
 		} else {
-			console.log("Cliente actualizado exitosamente");
+			// console.log("Cliente actualizado exitosamente");
 			await Cliente.findByIdAndUpdate(idCliente, datosActualizados, { new: true });
 		}
 	}

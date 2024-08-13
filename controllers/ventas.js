@@ -28,15 +28,13 @@ const httpVentas = {
     },
 	postVentas: async (req, res) => {
 		try {
-			const { fecha, codigoProducto, valorUnitario, cantidad, valorTotal } = req.body;
-			const producto = await Producto.findById(codigoProducto)
+			const { codigoProducto, valorUnitario, cantidad, valorTotal } = req.body;
 			
 			const venta = new Venta({
-				fecha,
 				codigoProducto,
-				valorUnitario: producto.valor,
-				cantidad: cantidad.replace(/[^0-9]/g, ''),
-				valorTotal: producto.valor * cantidad,
+				valorUnitario,
+				cantidad,
+				valorTotal,
 			});
 
 			await venta.save();
@@ -49,13 +47,12 @@ const httpVentas = {
 	putVentas: async (req, res) => {
 		try {
 			const { id } = req.params;
-			const { fecha, codigoProducto, valorUnitario, cantidad, valorTotal } = req.body;
+			const { codigoProducto, valorUnitario, cantidad, valorTotal } = req.body;
 			try {
 				const updateFields = {
-					...(fecha && { fecha }),
 					...(codigoProducto && { codigoProducto }),
 					...(valorUnitario && { valorUnitario }),
-					...(cantidad && { cantidad: cantidad.toString().replace(/[^0-9]/g, '') }),
+					...(cantidad && { cantidad }),
 					...(valorTotal && { valorTotal }),
 				};
 

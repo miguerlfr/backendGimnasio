@@ -26,7 +26,6 @@ export default mongoose.model("Usuario", usuarioSchema);
 //     "password": "juan12345",
 //     "rol": "Administrador"
 // }
-
 // {
 //     "sede": "Sede B",
 //     "nombre": "María Rodríguez",
@@ -35,7 +34,6 @@ export default mongoose.model("Usuario", usuarioSchema);
 //     "password": "maria12345",
 //     "rol": "Recepcionista"
 // }
-
 // {
 //     "sede": "Sede C",
 //     "nombre": "David Martínez",
@@ -44,7 +42,6 @@ export default mongoose.model("Usuario", usuarioSchema);
 //     "password": "david12345",
 //     "rol": "Instructor"
 // }
-
 // {
 //     "sede": "Sede A",
 //     "nombre": "Ana García",
@@ -53,7 +50,6 @@ export default mongoose.model("Usuario", usuarioSchema);
 //     "password": "ana12345",
 //     "rol": "Administrador"
 // }
-
 // {
 //     "sede": "Sede B",
 //     "nombre": "Laura Pérez",

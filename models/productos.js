@@ -16,28 +16,24 @@ export default mongoose.model("Producto", productoSchema);
 //       "valor": 10000,
 //       "cantidad": 20
 //   }
-
 //   {
 //       "codigo": "PROD2",
 //       "descripcion": "Camiseta de algodón",
 //       "valor": 20000,
 //       "cantidad": 40
 //   }
-
 //   {
 //       "codigo": "PROD3",
 //       "descripcion": "Pantalones vaqueros",
 //       "valor": 30000,
 //       "cantidad": 60
 //   }
-
 //   {
 //       "codigo": "PROD4",
 //       "descripcion": "Zapatillas deportivas",
 //       "valor": 40000,
 //       "cantidad": 80
 //   }
-
 //   {
 //       "codigo": "PROD5",
 //       "descripcion": "Mochila escolar",

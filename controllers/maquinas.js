@@ -20,13 +20,12 @@ const httpMaquinas = {
 	},
 	postMaquinas: async (req, res) => {
 		try {
-			const { codigo, sede, descripcion, fechaIngreso, fechaUltMan, estado } = req.body;
+			const { codigo, sede, descripcion, fechaIngreso, estado } = req.body;
 			const maquinas = new Maquina({
 				codigo,
 				sede,
 				descripcion,
 				fechaIngreso,
-				fechaUltMan,
 				estado,
 			});
 			await maquinas.save();
@@ -39,7 +38,7 @@ const httpMaquinas = {
 	putMaquinas: async (req, res) => {
 		try {
 			const { id } = req.params;
-			const { codigo, sede, descripcion, fechaIngreso, fechaUltMan } = req.body;
+			const { codigo, sede, descripcion, fechaIngreso } = req.body;
 			try {
 				const updateFields = {};
 
@@ -47,12 +46,10 @@ const httpMaquinas = {
 				if (sede !== undefined) updateFields.sede = sede;
 				if (descripcion !== undefined) updateFields.descripcion = descripcion;
 				if (fechaIngreso !== undefined) updateFields.fechaIngreso = fechaIngreso;
-				if (fechaUltMan !== undefined) updateFields.fechaUltMan = fechaUltMan;
 
 				if (Object.keys(updateFields).length === 0) {
 					return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });
 				}
-
 				const maquinaActualizada = await Maquina.findByIdAndUpdate(id, updateFields, { new: true });
 
 				if (!maquinaActualizada) {

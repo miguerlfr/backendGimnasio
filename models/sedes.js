@@ -21,7 +21,6 @@ export default mongoose.model("Sede", sedeSchema);
 //       "telefono": 1234567890,
 //       "estado": 1
 //   }
-
 //   {
 //       "nombre": "Sede B",
 //       "direccion": "456 Calle 12",
@@ -31,7 +30,6 @@ export default mongoose.model("Sede", sedeSchema);
 //       "telefono": 9876543210,
 //       "estado": 1
 //   }
-
 //   {
 //       "nombre": "Sede C",
 //       "direccion": "789 Carretera 13",

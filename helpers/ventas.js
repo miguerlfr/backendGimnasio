@@ -2,29 +2,30 @@ import Producto from '../models/productos.js';
 import Venta from '../models/ventas.js';
 
 const helpersVentas = {
-    postCodigoPto: async (codigoProducto, valorUnitario, cantidad) => {
-        // Buscar si existe el producto con el código especificado
-        const existe = await Producto.findOne({ _id: codigoProducto });
-        if (!existe) {
-            throw new Error("El código del producto no existe");
-        } else {
-            // Verificar si el valor unitario del producto es correcto
-            const validarValor = await Producto.findOne({ _id: existe._id, valor: valorUnitario });
-            if (!validarValor) {
-                throw new Error("El valor unitario del producto es incorrecto");
-            } else {
-                // Restar la cantidad del producto
-                const nuevaCantidad = existe.cantidad - cantidad;
-                if (nuevaCantidad < 0) {
-                    throw new Error("La cantidad de producto(s) no es válida");
-                }
+  postCodigoPto: async (codigoProducto, valorUnitario, cantidad) => {
+    // Buscar el producto por código
+    const producto = await Producto.findOne({ _id: codigoProducto });
+    if (!producto) {
+      throw new Error("El código del producto no existe");
+    }
 
-                // Actualizar la cantidad del producto en la base de datos
-                await Producto.updateOne({ _id: existe._id }, { cantidad: nuevaCantidad });
-                return { message: "Cantidad actualizada correctamente", nuevaCantidad };
-            }
-        }
-    },
+    // Convertir valorUnitario a número para la comparación
+    // const valorUnitarioNumero = parseFloat(valorUnitario);
+    // if (producto.valor !== valorUnitarioNumero) {
+    //   throw new Error("El valor unitario del producto es incorrecto");
+    // }
+
+    // Verificar la cantidad disponible
+    const cantidadNumero = parseInt(cantidad, 10);
+    const nuevaCantidad = producto.cantidad - cantidadNumero;
+    if (nuevaCantidad < 0) {
+      throw new Error("La cantidad de producto(s) no existe");
+    }
+
+    // Actualizar la cantidad del producto
+    await Producto.updateOne({ _id: producto._id }, { cantidad: nuevaCantidad });
+    return { message: "Cantidad actualizada correctamente", nuevaCantidad };
+  },
     putId: async (idVenta, datosActualizados) => {
         // Buscar la venta por ID
         const ventaActual = await Venta.findById(idVenta);
@@ -40,15 +41,6 @@ const helpersVentas = {
         const datosIguales = Object.keys(datosActualizados).every(key => {
             let valorActual = ventaActual[key];
             let valorActualizado = datosActualizados[key];
-
-            // Manejar el caso específico de la fecha
-            if (key === 'fecha' && valorActual instanceof Date) {
-                valorActual = valorActual.toISOString().split('T')[0]; // Eliminar la parte "T00:00:00.000Z"
-            }
-
-            if (key === 'fecha' && typeof valorActualizado === 'string') {
-                valorActualizado = valorActualizado.split('T')[0]; // Eliminar la parte "T00:00:00.000Z"
-            }
 
             // Convertir valores a cadena para comparación
             const valorActualStr = (valorActual || '').toString();
