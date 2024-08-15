@@ -3,6 +3,9 @@ import dbConexion from './database/conexionMongoose.js';
 import dotenv from 'dotenv';
 import cors from 'cors'
 
+// Importar cron job y envío de correos electrónicos
+import cronJob from './middlewares/jobs.js'; // Asegúrate de que la ruta sea correcta
+
 dotenv.config();
 
 import clientes from './routes/clientes.js';
@@ -40,4 +43,7 @@ app.use('/api/ventas', ventas);
 app.listen(process.env.PORT, async () => {
     await dbConexion();
     console.log(`Servidor escuchando en el puerto ${process.env.PORT}`);
+
+    // Iniciar el cron job
+    cronJob.start();
 });

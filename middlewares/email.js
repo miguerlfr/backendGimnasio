@@ -27,3 +27,31 @@ export const enviarEmailRecuperacion = async (email, token) => {
 		throw error;
 	}
 };
+
+export const PlanClienteTerminado = async (email, nombre, fechaVencimiento) => {
+	const transporter = nodemailer.createTransport({
+		service: "Gmail",
+		auth: {
+			user: "luismiguelvargasjaimes@gmail.com",
+			pass: process.env.FROM_EMAIL,
+		},
+	});
+
+	const emailCliente = {
+		from: "luismiguelvargasjaimes@gmail.com",
+		to: email,
+		subject: "Tu plan venció",
+		text: `Hola ${nombre}, tu plan ha vencido hoy, el ${(() => {
+			fechaVencimiento.setDate(fechaVencimiento.getDate() + 1);
+			return fechaVencimiento.toLocaleDateString('es-ES');
+		})()}. ¡No olvides renovarlo para seguir con nosotros!`,
+	};	
+	
+	try {
+		await transporter.sendMail(emailCliente);
+		console.log(`Correo enviado a: ${email}`);
+	} catch (error) {
+        console.error(`Error al enviar notificaciones de vencimiento de plan a ${email}:`, error);
+		throw error;
+	}
+};

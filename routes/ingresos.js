@@ -3,14 +3,14 @@ import httpIngresos from '../controllers/ingresos.js';
 import { check } from 'express-validator';
 import helpersIngresos from '../helpers/ingresos.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
-import { validarJWT } from '../middlewares/validar-jwt.js';
+// import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
 
 router.get('/',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpIngresos.getIngresos
 );
@@ -19,7 +19,7 @@ router.get('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpIngresos.getIngresosID
 );
@@ -31,7 +31,7 @@ router.get('/fechas/:fechaInicio/:fechaFin',
     check('fechaFin', 'La fecha de fin es requerida.').notEmpty(),
     check('fechaFin', 'La fecha de fin debe ser una fecha válida.').toDate(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpIngresos.getIngresosFechas
 );
@@ -46,7 +46,7 @@ router.post('/',
     check('cliente').custom(helpersIngresos.postPutCliente).optional(),
     // check('sede').custom((sede, { req }) => helpersIngresos.postSedeCliente(sede, req.body.cliente)).optional(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpIngresos.postIngresos
 );
@@ -64,7 +64,7 @@ router.put('/:id',
     // check('cliente', 'Se necesita un cliente con el mongoId válido').isMongoId().optional(),
     check('cliente').custom(helpersIngresos.postPutCliente).optional(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpIngresos.putIngresos
 );

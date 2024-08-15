@@ -3,14 +3,14 @@ import httpMantenimientos from '../controllers/mantenimientos.js';
 import { check } from 'express-validator';
 import helpersMantenimientos from '../helpers/mantenimientos.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
-import { validarJWT } from '../middlewares/validar-jwt.js';
+// import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
 
 router.get('/',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.getMantenimientos
 );
@@ -18,7 +18,7 @@ router.get('/',
 router.get('/activos',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.getMantenimientosActivos
 );
@@ -26,7 +26,7 @@ router.get('/activos',
 router.get('/inactivos',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.getMantenimientosInactivos
 );
@@ -35,7 +35,7 @@ router.get('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.getMantenimientosID
 );
@@ -43,7 +43,7 @@ router.get('/:id',
 router.get('/fechas/:fechaInicio/:fechaFin',
   [
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.getMantenimientosFechas
 );
@@ -59,7 +59,7 @@ router.post('/',
     check('precio', 'El precio debe ser numérico y no puede estar vacío').optional().isNumeric(),
     check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.postMantenimientos
 );
@@ -77,7 +77,7 @@ router.put('/:id',
     check('precio', 'El precio debe ser numérico y no puede estar vacío').optional().isNumeric(),
     check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.putMantenimientos
 );
@@ -86,7 +86,7 @@ router.put('/activar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.putMantenimientosActivar
 );
@@ -95,7 +95,7 @@ router.put('/inactivar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    validarJWT
+    // validarJWT
   ],
   httpMantenimientos.putMantenimientosInactivar
 );
