@@ -2,10 +2,15 @@ import mongoose from "mongoose";
 
 const productoSchema = new mongoose.Schema({
     codigo: { type: String, required: true },
+    proveedor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Proveedore",
+        required: true,
+    },
     descripcion: { type: String },
     valor: { type: Number, required: true },
     cantidad: { type: Number, required: true },
-    estado: { type: Number }
+    estado: { type: Number, default: 1 }
 });
 
 export default mongoose.model("Producto", productoSchema);

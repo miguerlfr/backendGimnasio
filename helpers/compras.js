@@ -56,12 +56,6 @@ const helpersCompras = {
       throw new Error("Ningún cambio proporcionado para editar.");
     }
   },
-  // putCodigoPto: async (codigoProducto, datosProducto) => {
-  //     const existe = await Producto.findOne({ _id: codigoProducto });
-  //     if (!existe) {
-  //       throw new Error(`El producto con código ${codigoProducto} no existe`);
-  //     }
-  //   },
   actualizarCompra: async (idCompra, datosCompra) => {
     try {
       // Paso 1: Obtener la compra anterior

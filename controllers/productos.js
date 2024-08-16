@@ -2,19 +2,19 @@ import Producto from "../models/productos.js";
 
 const httpProductos = {
 	getProductos: async (req, res) => {
-		const productos = await Producto.find();
+		const productos = await Producto.find().populate("proveedor", "nombre");
 		res.json({ productos });
 	},
 	getProductosActivos: async (req, res) => {
-		const productos = await Producto.find({ estado: 1 });
+		const productos = await Producto.find({ estado: 1 }).populate("proveedor", "nombre");
 		res.json({ productos });
 	},
 	getProductosInactivos: async (req, res) => {
-		const productos = await Producto.find({ estado: 0 });
+		const productos = await Producto.find({ estado: 0 }).populate("proveedor", "nombre");
 		res.json({ productos });
 	},
 	getProductosTotal: async (req, res) => {
-		const productosTotal = await Producto.find();
+		const productosTotal = await Producto.find().populate("proveedor", "nombre");
 		const total = productosTotal.reduce((acc, item) => {
 			return acc + item.valor;
 		}, 0);
@@ -22,17 +22,19 @@ const httpProductos = {
 	},
 	getProductosID: async (req, res) => {
 		const { id } = req.params;
-		const productos = await Producto.findById(id);
+		const productos = await Producto.findById(id).populate("proveedor", "nombre");
 		res.json({ productos });
 	},
 	postProductos: async (req, res) => {
 		try {
-			const { codigo, descripcion, valor, cantidad } = req.body;
+			const { codigo, proveedor, descripcion, valor, cantidad, estado } = req.body;
 			const productos = new Producto({
 				codigo,
+				proveedor,
 				descripcion,
 				valor: valor.replace(/[^0-9]/g, ''),
 				cantidad: cantidad.replace(/[^0-9]/g, ''),
+				estado
 			});
 			await productos.save();
 			res.json({ productos });
@@ -51,6 +53,7 @@ const httpProductos = {
 			const updateFields = {};
 	
 			if (codigo) updateFields.codigo = codigo;
+			if (proveedor) updateFields.proveedor = proveedor;
 			if (descripcion) updateFields.descripcion = descripcion;
 			if (valor) updateFields.valor = valor.toString().replace(/[^0-9]/g, '');
 			if (cantidad) updateFields.cantidad = cantidad.toString().replace(/[^0-9]/g, '');

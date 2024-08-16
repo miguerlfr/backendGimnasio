@@ -11,7 +11,7 @@ const usuarioSchema = new mongoose.Schema({
     telefono: { type: Number },
     password: { type: String, required: true },
     rol: { type: String, default: "User" },
-    estado: { type: Number },
+    estado: { type: Number, default: 1 }
 });
 
 export default mongoose.model("Usuario", usuarioSchema);

@@ -5,7 +5,7 @@ const planSchema = new mongoose.Schema({
     descripcion: { type: String },
     valor: { type: Number },
     dias: { type: Number },
-    estado: { type: Number }
+    estado: { type: Number, default: 1 }
 });
 
 export default mongoose.model("Plane", planSchema);

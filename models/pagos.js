@@ -13,7 +13,7 @@ const pagoSchema = new mongoose.Schema({
     },
     fecha: { type: Date, required: true },
     valor: { type: Number, required: true },
-    estado: { type: Number },
+    estado: { type: Number, default: 1 }
 });
 
 export default mongoose.model("Pago", pagoSchema);

@@ -9,7 +9,7 @@ const maquinaSchema = new mongoose.Schema({
     },
     descripcion: { type: String },
     fechaIngreso: { type: Date, required: true },
-    estado: { type: Number }
+    estado: { type: Number, default: 1 }
 }, {
     timestamps: true
 });
