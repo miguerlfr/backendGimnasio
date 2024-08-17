@@ -46,16 +46,37 @@ clienteSchema.pre('save', async function (next) {
             this.edad = edad;
         }
 
-        // Calcular fecha de vencimiento solo si plan y fechaIngreso están disponibles
-        if (this.fechaIngreso && this.plan) {
-            // Buscar el plan en la base de datos
-            const Plan = mongoose.model('Plane'); // Asume que el modelo del plan se llama 'Plane'
-            const plan = await Plan.findById(this.plan).exec();
+        // Buscar el plan en la base de datos
+        const Plan = mongoose.model('Plane'); // Asegúrate de que el modelo del plan se llama 'Plane'
+        const plan = await Plan.findById(this.plan).exec();
 
-            if (plan && plan.dias) {
-                // Calcular fecha de vencimiento
-                this.fechaVencimiento = new Date(this.fechaIngreso);
-                this.fechaVencimiento.setDate((this.fechaVencimiento.getDate() - 1) + plan.dias);
+        // Verificar si el cliente tiene pagos registrados
+        const Pagos = mongoose.model('Pago'); // Asegúrate de que el modelo de pagos se llama 'Pago'
+        const pagosRegistrados = await Pagos.find({ cliente: this._id }).exec();
+
+        if (plan && plan.dias) {
+            if (pagosRegistrados.length === 0) {
+                // Si el cliente no tiene pagos registrados
+                if (this.fechaIngreso) {
+                    this.fechaVencimiento = new Date(this.fechaIngreso);
+
+                    // Si el plan es de un año (365 días o más), establecer la fecha de vencimiento al final del año
+                    if (plan.dias >= 365) {
+                        const fechaIngreso = new Date(this.fechaIngreso);
+                        this.fechaVencimiento = new Date(fechaIngreso.getFullYear(), 11, 31); // 31 de diciembre del año de ingreso
+                    } else {
+                        // Para otros planes, simplemente añade los días
+                        this.fechaVencimiento.setDate(this.fechaVencimiento.getDate() + plan.dias - 1);
+                    }
+                }
+            } else {
+                // Si el cliente ya tiene pagos registrados, actualiza la fecha de vencimiento
+                if (this.fechaVencimiento) {
+                    // Asegúrate de que `this.fechaVencimiento` esté definida
+                    const fechaVencimiento = new Date(this.fechaVencimiento);
+                    fechaVencimiento.setDate(fechaVencimiento.getDate() + plan.dias);
+                    this.fechaVencimiento = fechaVencimiento;
+                }
             }
         }
 

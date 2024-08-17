@@ -20,12 +20,13 @@ const httpMaquinas = {
 	},
 	postMaquinas: async (req, res) => {
 		try {
-			const { codigo, sede, descripcion, fechaIngreso, estado } = req.body;
+			const { codigo, sede, descripcion, fechaIngreso, fechaUlt, estado } = req.body;
 			const maquinas = new Maquina({
 				codigo,
 				sede,
 				descripcion,
 				fechaIngreso,
+				fechaUlt,
 				estado,
 			});
 			await maquinas.save();
@@ -38,7 +39,7 @@ const httpMaquinas = {
 	putMaquinas: async (req, res) => {
 		try {
 			const { id } = req.params;
-			const { codigo, sede, descripcion, fechaIngreso } = req.body;
+			const { codigo, sede, descripcion, fechaIngreso, fechaUlt } = req.body;
 			try {
 				const updateFields = {};
 
@@ -46,6 +47,7 @@ const httpMaquinas = {
 				if (sede !== undefined) updateFields.sede = sede;
 				if (descripcion !== undefined) updateFields.descripcion = descripcion;
 				if (fechaIngreso !== undefined) updateFields.fechaIngreso = fechaIngreso;
+				if (fechaUlt !== undefined) updateFields.fechaUlt = fechaUlt;
 
 				if (Object.keys(updateFields).length === 0) {
 					return res.status(400).json({ error: "Ningún campo proporcionado para actualizar." });

@@ -13,7 +13,7 @@ const compraSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
+// y si el cliente ya tiene un pago entonces 
 // Middleware para calcular valorTotal antes de guardar
 compraSchema.pre('save', async function (next) {
     try {
