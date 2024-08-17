@@ -96,17 +96,17 @@ const helpersPagos = {
 	},
 	putPlan: async (pagoId, nuevoClienteId, nuevoPlanId) => {
 		try {
-			const pago = await Pago.findById(pagoId).populate("cliente").exec();
-			if (!pago) throw new Error("El pago no existe");
+			const pago = await Pago.findById(pagoId).populate('cliente').exec();
+			if (!pago) throw new Error('El pago no existe');
 
 			const clienteAnteriorId = pago.cliente._id;
 			const planAnteriorId = pago.cliente.plan;
-			const planAnterior = await Plan.findById(planAnteriorId).exec();
-			const nuevoPlan = await Plan.findById(nuevoPlanId).exec();
+			const planAnterior = await Plane.findById(planAnteriorId).exec();
+			const nuevoPlan = await Plane.findById(nuevoPlanId).exec();
 
-			if (!nuevoPlan) throw new Error("El nuevo plan no existe");
+			if (!nuevoPlan) throw new Error('El nuevo plan no existe');
 
-			// Si el cliente cambia, actualiza el plan y fecha de vencimiento
+			// Si el cliente cambia, actualiza el plan y la fecha de vencimiento
 			if (String(clienteAnteriorId) !== String(nuevoClienteId)) {
 				const clienteAnterior = await Cliente.findById(clienteAnteriorId).exec();
 				const nuevoCliente = await Cliente.findById(nuevoClienteId).exec();

@@ -93,8 +93,8 @@ router.put("/:id",
     check('cliente').custom(helpersPagos.postPutId).optional(),
     check("plan").optional(helpersPagos.postPutPlan).optional(),
     check('cliente').custom(async (clienteId, { req }) => {
-      const { cliente, plan } = req.body;
-      await helpersPagos.actualizarClienteYPlan(req.params.id, cliente, plan);
+      const { plan } = req.body;
+      await helpersPagos.putPlan(req.params.id, clienteId, plan);
     }).optional(),
     check("fecha", "La fecha es requerida y debe estar en formato ISO8601").optional().toDate(),
     check("valor", "El valor debe ser numérico").optional().isNumeric(),
