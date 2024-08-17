@@ -54,61 +54,75 @@ const helpersPagos = {
 	},
 	postPlanQ: async (clienteId, planId) => {
 		try {
-		  const cliente = await Cliente.findById(clienteId);
-		  if (!cliente) {
-			throw new Error("El cliente no existe");
-		  }
-	  
-		  const plan = await Plane.findById(planId);
-		  if (!plan) {
-			throw new Error("El plan no existe");
-		  }
-	  
-		  const diasPlan = plan.dias || 30; // Duración del plan en días (por defecto 30 días)
-		  const pagosCliente = await Pago.find({ cliente: clienteId });
-	  
-		  if (pagosCliente.length === 0) {
-			// Primer pago
-			if (cliente.plan.toString() !== planId) {
-			  cliente.plan = planId;
-	  
-			  if (cliente.fechaIngreso) {
-				cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
-				cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + diasPlan - 1);
-			  }
+			const cliente = await Cliente.findById(clienteId);
+			if (!cliente) {
+				throw new Error("El cliente no existe");
 			}
-		  } else {
-			// Pagos posteriores
-			if (cliente.plan.toString() !== planId) {
-			  cliente.plan = planId;
+	
+			const plan = await Plane.findById(planId);
+			if (!plan) {
+				throw new Error("El plan no existe");
 			}
-	  
-			// Si el estado del cliente es 0, cambiarlo a 1
-			if (cliente.estado === 0) {
-			  cliente.estado = 1;
+	
+			const diasPlan = plan.dias || 30; // Duración del plan en días (por defecto 30 días)
+			const pagosCliente = await Pago.find({ cliente: clienteId });
+	
+			if (pagosCliente.length === 0) {
+				// Primer pago
+				if (cliente.plan.toString() !== planId) {
+					cliente.plan = planId;
+	
+					if (cliente.fechaIngreso) {
+						cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
+						if (plan.dias >= 365) {
+							// Si el plan es de un año o más, establecer la fecha de vencimiento al final del año
+							cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
+							cliente.fechaVencimiento.setFullYear(cliente.fechaIngreso.getFullYear() + 1);
+							cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() - 1); // El último día del año
+						} else {
+							// Para otros planes, añade los días
+							cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + diasPlan - 1);
+						}
+					}
+				}
+			} else {
+				// Pagos posteriores
+				if (cliente.plan.toString() !== planId) {
+					cliente.plan = planId;
+				}
+	
+				// Si el estado del cliente es 0, cambiarlo a 1
+				if (cliente.estado === 0) {
+					cliente.estado = 1;
+				}
+	
+				// Sumar los días del plan a la fecha de vencimiento del cliente
+				if (cliente.fechaVencimiento) {
+					const nuevaFechaVencimiento = new Date(cliente.fechaVencimiento);
+					nuevaFechaVencimiento.setDate(nuevaFechaVencimiento.getDate() + diasPlan);
+					cliente.fechaVencimiento = nuevaFechaVencimiento;
+				} else if (cliente.fechaIngreso) {
+					cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
+					if (plan.dias >= 365) {
+						// Si el plan es de un año o más, establecer la fecha de vencimiento al final del año
+						cliente.fechaVencimiento.setFullYear(cliente.fechaIngreso.getFullYear() + 1);
+						cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() - 1); // El último día del año
+					} else {
+						// Para otros planes, añade los días
+						cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + diasPlan - 1);
+					}
+				}
 			}
-	  
-			// Sumar los días del plan a la fecha de vencimiento del cliente
-			// if (cliente.fechaVencimiento) {
-			//   const nuevaFechaVencimiento = new Date(cliente.fechaVencimiento);
-			//   nuevaFechaVencimiento.setDate(nuevaFechaVencimiento.getDate() + diasPlan);
-			//   cliente.fechaVencimiento = nuevaFechaVencimiento;
-			// } else if (cliente.fechaIngreso) {
-			//   cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
-			//   cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + diasPlan - 1);
-			// }
-		  }
-	  
-		  // Guardar los cambios en el cliente
-		  await cliente.save();
-	  
-		  return cliente; // Devuelve el cliente actualizado si es necesario
+	
+			// Guardar los cambios en el cliente
+			await cliente.save();
+	
+			return cliente; // Devuelve el cliente actualizado si es necesario
 		} catch (error) {
-		  console.error("Error en postPlanQ:", error);
-		  throw new Error(`No se pudo procesar el plan: ${error.message}`);
+			console.error("Error en postPlanQ:", error);
+			throw new Error(`No se pudo procesar el plan: ${error.message}`);
 		}
-	  },
-			  
+	},	
 	putPlan: async (pagoId, nuevoClienteId, nuevoPlanId) => {
 		try {
 		  const pago = await Pago.findById(pagoId).populate('cliente').exec();
