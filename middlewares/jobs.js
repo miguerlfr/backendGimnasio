@@ -52,7 +52,7 @@ const cronJobRecordatorio = cron.schedule('10 18 * * *', async () => {
 
 
 // Definición del cron job para que se ejecute todos los días a las 9:00 PM
-const cronJob = cron.schedule('10 19 * * *', async () => {
+const cronJob = cron.schedule('10 18 * * *', async () => {
   const now = new Date();
   const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfDay = new Date(localDate.getTime());
