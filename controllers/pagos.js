@@ -108,7 +108,7 @@ const httpPagos = {
             { new: true }
         );
         res.json({ pagos });
-    },
+    }
 };
 
 export default httpPagos;
