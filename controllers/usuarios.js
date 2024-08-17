@@ -160,7 +160,7 @@ const httpUsuarios = {
 			res.json({ msg: 'Correo de recuperación enviado' });
 		} catch (error) {
 			console.error("Error en la función recuperarContrasena:", error);
-			res.status(500).json({ msg: 'Error de servidor' });
+			res.status(500).json({ msg: 'Error de servidor', error });
 		}
 	},
 	contraseñaCambiada: async (req, res) => {
