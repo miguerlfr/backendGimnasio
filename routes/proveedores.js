@@ -3,14 +3,14 @@ import httpProveedores from '../controllers/proveedores.js';
 import { check } from 'express-validator';
 import { validarCampos } from '../middlewares/validar-campos.js';
 import helpersProveedores from '../helpers/proveedores.js';
-// import { validarJWT } from '../middlewares/validar-jwt.js';
+import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
 
 router.get("/",
     [
       validarCampos,
-      // validarJWT
+      validarJWT
     ],
     httpProveedores.getProveedores
     
@@ -19,7 +19,7 @@ router.get("/",
   router.get('/activos',
     [
       validarCampos,
-      // validarJWT
+      validarJWT
     ],
     httpProveedores.getProveedoresActivos
   );
@@ -27,7 +27,7 @@ router.get("/",
   router.get('/inactivos',
     [
       validarCampos,
-      // validarJWT
+      validarJWT
     ],
     httpProveedores.getProveedoresInactivos
   );
@@ -36,7 +36,7 @@ router.get("/",
     [
       check('id', 'Se necesita un mongoId válido').isMongoId(),
       validarCampos,
-      // validarJWT
+      validarJWT
     ],
     httpProveedores.getProveedoresID
   );
@@ -47,7 +47,7 @@ router.post('/',
     check("telefono", "El teléfono deben ser solo números y tener mínimo de 10 caracteres").optional().isNumeric().isLength({ min: 10 }),
     check('notas', 'El campo notas es requerido y no puede estar vacío').trim().notEmpty(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpProveedores.postProveedores
 );
@@ -62,7 +62,7 @@ router.put('/:id',
     check("telefono", "El teléfono deben ser solo números y tener mínimo de 10 caracteres").optional().isNumeric().isLength({ min: 10 }),
     check('notas', 'El campo notas es requerido y no puede estar vacío').trim().notEmpty(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpProveedores.putProveedores
 );
@@ -71,7 +71,7 @@ router.put('/activar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpProveedores.putProveedoresActivar
 );
@@ -80,7 +80,7 @@ router.put('/inactivar/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpProveedores.putProveedoresInactivar
 );

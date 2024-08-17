@@ -3,14 +3,14 @@ import httpMaquinas from '../controllers/maquinas.js';
 import { check } from 'express-validator';
 import helpersMaquinas from '../helpers/maquinas.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
-// import { validarJWT } from '../middlewares/validar-jwt.js';
+import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
 
 router.get('/',
     [
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.getMaquinas
 );
@@ -18,7 +18,7 @@ router.get('/',
 router.get('/activos',
     [
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.getMaquinasActivos
 );
@@ -26,7 +26,7 @@ router.get('/activos',
 router.get('/inactivos',
     [
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.getMaquinasInactivos
 );
@@ -35,7 +35,7 @@ router.get('/:id',
     [
         check('id', 'Se necesita un mongoId válido').isMongoId(),
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.getMaquinasID
 );
@@ -49,7 +49,7 @@ router.post('/',
         check('fechaIngreso', 'La fecha de ingreso es requerida y debe estar en formato ISO8601').notEmpty().toDate(),
         check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.postMaquinas
 );
@@ -65,7 +65,7 @@ router.put('/:id',
         check('fechaIngreso', 'La fecha de ingreso debe estar en formato ISO8601').optional().toDate(),
         check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.putMaquinas
 );
@@ -74,7 +74,7 @@ router.put('/activar/:id',
     [
         check('id', 'Se necesita un mongoId válido').isMongoId(),
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.putMaquinasActivar
 );
@@ -83,7 +83,7 @@ router.put('/inactivar/:id',
     [
         check('id', 'Se necesita un mongoId válido').isMongoId(),
         validarCampos,
-        // validarJWT
+        validarJWT
     ],
     httpMaquinas.putMaquinasInactivar
 );

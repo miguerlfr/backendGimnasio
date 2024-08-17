@@ -3,14 +3,14 @@ import httpVentas from '../controllers/ventas.js';
 import { check } from 'express-validator';
 import helpersVentas from '../helpers/ventas.js';
 import { validarCampos } from '../middlewares/validar-campos.js';
-// import { validarJWT } from '../middlewares/validar-jwt.js';
+import { validarJWT } from '../middlewares/validar-jwt.js';
 
 const router = Router();
 
 router.get('/',
   [
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpVentas.getVentas
 );
@@ -19,7 +19,7 @@ router.get('/:id',
   [
     check('id', 'Se necesita un mongoId válido').isMongoId(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpVentas.getVentasID
 );
@@ -31,7 +31,7 @@ router.get('/fechas/:fechaInicio/:fechaFin',
     check('fechaFin', 'La fecha de fin es requerida.').notEmpty(),
     check('fechaFin', 'La fecha de fin debe ser una fecha válida.').toDate(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ], httpVentas.getVentasFechas
 );
 
@@ -43,7 +43,7 @@ router.post('/',
     }),
     check('cantidad', 'La cantidad es requerida y debe ser numérico').notEmpty().isNumeric(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpVentas.postVentas
 );
@@ -59,7 +59,7 @@ router.put('/:id',
     }),
     check('cantidad', 'La cantidad debe ser numérico').optional().isNumeric(),
     validarCampos,
-    // validarJWT
+    validarJWT
   ],
   httpVentas.putVentas
 );
