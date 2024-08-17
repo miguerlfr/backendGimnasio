@@ -111,21 +111,14 @@ const httpClientes = {
 				return res.status(400).json({ error: "ID del cliente es requerido" });
 			}
 	
-			let { nombre, fechaIngreso, documento, fechaNacimiento, direccion, email, objetivo, observaciones, plan, fechaVencimiento, seguimiento } = req.body;
+			let { nombre, fechaIngreso, documento, fechaNacimiento, direccion, email, objetivo, observaciones, plan, seguimiento } = req.body;
 	
 			// Verificar si el plan se proporcionó y si existe
-			let planData;
 			if (plan) {
-				planData = await Plane.findById(plan);
+				const planData = await Plane.findById(plan);
 				if (!planData) {
-					return res.status(404).json({ error: "Plan no encontrado" });
+					throw new Error("Plan no encontrado");
 				}
-			}
-	
-			// Obtener el cliente actual
-			const clienteActual = await Cliente.findById(id);
-			if (!clienteActual) {
-				return res.status(404).json({ error: "ID del Cliente no encontrado" });
 			}
 	
 			// Campos actualizables del cliente
@@ -139,7 +132,6 @@ const httpClientes = {
 				objetivo,
 				observaciones,
 				plan,
-				fechaVencimiento: fechaVencimiento ? new Date(fechaVencimiento) : undefined,
 				seguimiento,
 			};
 	
@@ -155,44 +147,21 @@ const httpClientes = {
 			}
 	
 			// Actualizar el cliente
-			Object.assign(clienteActual, camposActualizables);
+			const clienteActualizado = await Cliente.findByIdAndUpdate(id, camposActualizables, { new: true });
 	
-			// Verificar si el plan ha cambiado o si no hay pagos registrados
-			const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
-			const pagosCliente = await Pago.find({ cliente: id }).exec();
-	
-			// Asegúrate de que pagosCliente sea un array
-			if (!Array.isArray(pagosCliente)) {
-				throw new Error("Error al obtener pagos del cliente.");
-			}
-	
-			const planChanged = plan && (clienteActual.plan.toString() !== plan);
-	
-			if (pagosCliente.length === 0 || planChanged) {
-				// Solo si el cliente tiene una fechaIngreso y un plan
-				if (clienteActual.fechaIngreso && (plan || clienteActual.plan)) {
-					// Obtener los datos del plan si ha cambiado
-					if (!planData && clienteActual.plan) {
-						planData = await Plane.findById(clienteActual.plan).exec();
-					}
-	
-					if (planData && planData.dias) {
-						// Calcular fecha de vencimiento
-						clienteActual.fechaVencimiento = new Date(clienteActual.fechaIngreso);
-						clienteActual.fechaVencimiento.setDate(clienteActual.fechaVencimiento.getDate() + planData.dias);
-					}
-				}
+			if (!clienteActualizado) {
+				return res.status(404).json({ error: "ID del Cliente no encontrado" });
 			}
 	
 			// Calcular IMC después de la actualización
-			clienteActual.calcularIMC();
-			await clienteActual.save();
+			clienteActualizado.calcularIMC();
+			await clienteActualizado.save();
 	
-			res.json(clienteActual);
+			res.json(clienteActualizado);
 		} catch (error) {
 			// Manejar errores
 			console.log("error:", error);
-			res.status(400).json({ error: `No se pudo editar el cliente: ${error.message}` });
+			res.status(400).json({ error: `No se pudo editar el cliente ${error.message}` });
 		}
 	},	
 	putClientesActivar: async (req, res) => {
