@@ -92,10 +92,10 @@ router.put("/:id",
     check('cliente', 'El cliente debe ser un ID de MongoID válido').optional().isMongoId(),
     check('cliente').custom(helpersPagos.postPutId).optional(),
     check("plan").optional(helpersPagos.postPutPlan).optional(),
-    check('cliente').custom(async (clienteId, { req }) => {
-      const { plan } = req.body;
-      await helpersPagos.putPlan(req.params.id, clienteId, plan);
-    }).optional(),
+    // check('cliente').custom(async (clienteId, { req }) => {
+    //   const { plan } = req.body;
+    //   await helpersPagos.putPlan(req.params.id, clienteId, plan);
+    // }).optional(),
     check("fecha", "La fecha es requerida y debe estar en formato ISO8601").optional().toDate(),
     check("valor", "El valor debe ser numérico").optional().isNumeric(),
     check('estado', 'El estado debe ser un número entero entre 0 y 1').optional().isInt({ min: 0, max: 1 }),
