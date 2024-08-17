@@ -111,26 +111,22 @@ const httpClientes = {
 				return res.status(400).json({ error: "ID del cliente es requerido" });
 			}
 	
-			let { nombre, fechaIngreso, documento, fechaNacimiento, direccion, email, objetivo, observaciones, plan, seguimiento } = req.body;
+			let { nombre, fechaIngreso, documento, fechaNacimiento, direccion, email, objetivo, observaciones, plan, fechaVencimiento, seguimiento } = req.body;
 	
 			// Verificar si el plan se proporcionó y si existe
 			let planData;
 			if (plan) {
 				planData = await Plane.findById(plan);
 				if (!planData) {
-					throw new Error("Plan no encontrado");
+					return res.status(404).json({ error: "Plan no encontrado" });
 				}
 			}
 	
 			// Obtener el cliente actual
 			const clienteActual = await Cliente.findById(id);
-	
 			if (!clienteActual) {
 				return res.status(404).json({ error: "ID del Cliente no encontrado" });
 			}
-	
-			// Verificar si el plan ha cambiado
-			const planChanged = plan && (clienteActual.plan.toString() !== plan);
 	
 			// Campos actualizables del cliente
 			const camposActualizables = {
@@ -143,6 +139,7 @@ const httpClientes = {
 				objetivo,
 				observaciones,
 				plan,
+				fechaVencimiento: fechaVencimiento ? new Date(fechaVencimiento) : undefined,
 				seguimiento,
 			};
 	
@@ -160,14 +157,22 @@ const httpClientes = {
 			// Actualizar el cliente
 			Object.assign(clienteActual, camposActualizables);
 	
-			// Calcular la fecha de vencimiento solo si no hay pagos registrados o si el plan ha cambiado
+			// Verificar si el plan ha cambiado o si no hay pagos registrados
 			const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
 			const pagosCliente = await Pago.find({ cliente: id }).exec();
 	
+			// Asegúrate de que pagosCliente sea un array
+			if (!Array.isArray(pagosCliente)) {
+				throw new Error("Error al obtener pagos del cliente.");
+			}
+	
+			const planChanged = plan && (clienteActual.plan.toString() !== plan);
+	
 			if (pagosCliente.length === 0 || planChanged) {
-				if (clienteActual.fechaIngreso && clienteActual.plan) {
-					// Buscar el plan en la base de datos
-					if (!planData) {
+				// Solo si el cliente tiene una fechaIngreso y un plan
+				if (clienteActual.fechaIngreso && (plan || clienteActual.plan)) {
+					// Obtener los datos del plan si ha cambiado
+					if (!planData && clienteActual.plan) {
 						planData = await Plane.findById(clienteActual.plan).exec();
 					}
 	
@@ -189,7 +194,7 @@ const httpClientes = {
 			console.log("error:", error);
 			res.status(400).json({ error: `No se pudo editar el cliente: ${error.message}` });
 		}
-	},			
+	},	
 	putClientesActivar: async (req, res) => {
 		const { id } = req.params;
 		const clientes = await Cliente.findByIdAndUpdate(id, { estado: 1 }, { new: true });
