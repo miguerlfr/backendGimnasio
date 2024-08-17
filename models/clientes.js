@@ -32,6 +32,49 @@ const clienteSchema = new mongoose.Schema({
 });
 
 // Middleware para calcular la edad y fecha de vencimiento antes de guardar
+// clienteSchema.pre('save', async function (next) {
+//     try {
+//         // Calcular la edad si fechaNacimiento está disponible
+//         if (this.fechaNacimiento) {
+//             const hoy = new Date();
+//             const nacimiento = new Date(this.fechaNacimiento);
+//             let edad = hoy.getFullYear() - nacimiento.getFullYear();
+//             const mes = hoy.getMonth() - nacimiento.getMonth();
+//             if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+//                 edad--;
+//             }
+//             this.edad = edad;
+//         }
+
+//         // Verificar si el cliente ya tiene pagos registrados
+//         const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
+//         const pagosCliente = await Pago.find({ cliente: this._id }).exec();
+
+//         // Calcular fecha de vencimiento solo si no hay pagos registrados
+//         if (pagosCliente.length === 0) {
+//             if (this.fechaIngreso && this.plan) {
+//                 // Buscar el plan en la base de datos
+//                 const Plan = mongoose.model('Plane'); // Asume que el modelo del plan se llama 'Plane'
+//                 const plan = await Plan.findById(this.plan).exec();
+
+//                 if (plan && plan.dias) {
+//                     // Calcular fecha de vencimiento
+//                     this.fechaVencimiento = new Date(this.fechaIngreso);
+//                     this.fechaVencimiento.setDate((this.fechaVencimiento.getDate() -1) + plan.dias);
+//                 }
+//             }
+//         } else {
+//             // Si hay pagos, mantener la fecha de vencimiento actual
+//             this.fechaVencimiento = this.fechaVencimiento;
+//         }
+
+//         next();
+//     } catch (error) {
+//         next(error); // Pasa el error al middleware de manejo de errores
+//     }
+// });
+
+// Middleware para calcular la edad y fecha de vencimiento antes de guardar
 clienteSchema.pre('save', async function (next) {
     try {
         // Calcular la edad si fechaNacimiento está disponible
@@ -47,20 +90,18 @@ clienteSchema.pre('save', async function (next) {
         }
 
         // Verificar si el cliente ya tiene pagos registrados
-        const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
+        const Pago = mongoose.model('Pago');
         const pagosCliente = await Pago.find({ cliente: this._id }).exec();
 
         // Calcular fecha de vencimiento solo si no hay pagos registrados
         if (pagosCliente.length === 0) {
             if (this.fechaIngreso && this.plan) {
-                // Buscar el plan en la base de datos
-                const Plan = mongoose.model('Plane'); // Asume que el modelo del plan se llama 'Plane'
+                const Plan = mongoose.model('Plane');
                 const plan = await Plan.findById(this.plan).exec();
 
                 if (plan && plan.dias) {
-                    // Calcular fecha de vencimiento
                     this.fechaVencimiento = new Date(this.fechaIngreso);
-                    this.fechaVencimiento.setDate((this.fechaVencimiento.getDate() -1) + plan.dias);
+                    this.fechaVencimiento.setDate((this.fechaVencimiento.getDate() - 1) + plan.dias);
                 }
             }
         } else {
@@ -70,7 +111,7 @@ clienteSchema.pre('save', async function (next) {
 
         next();
     } catch (error) {
-        next(error); // Pasa el error al middleware de manejo de errores
+        next(error);
     }
 });
 
