@@ -120,58 +120,34 @@ const helpersPagos = {
 		  const pago = await Pago.findById(pagoId).populate('cliente').exec();
 		  if (!pago) throw new Error('El pago no existe');
 	  
-		  const clienteAnteriorId = pago.cliente._id;
-		  const planAnteriorId = pago.cliente.plan;
+		  const cliente = await Cliente.findById(nuevoClienteId).exec();
 		  const nuevoPlan = await Plane.findById(nuevoPlanId).exec();
 	  
+		  if (!cliente) throw new Error('El cliente no existe');
 		  if (!nuevoPlan) throw new Error('El nuevo plan no existe');
 	  
-		  // Obtener el cliente actual y el nuevo cliente (si es diferente)
-		  const clienteAnterior = await Cliente.findById(clienteAnteriorId).exec();
-		  const nuevoCliente = await Cliente.findById(nuevoClienteId).exec();
-	  
-		  // Si el cliente cambia o el plan cambia, se debe actualizar el plan y la fecha de vencimiento
-		  if (clienteAnterior && nuevoCliente) {
-			// Si el cliente es el mismo, sumar los días del nuevo plan a la fecha de vencimiento actual
-			if (String(clienteAnteriorId) === String(nuevoClienteId)) {
-			  if (clienteAnterior.fechaVencimiento) {
-				clienteAnterior.fechaVencimiento.setDate(clienteAnterior.fechaVencimiento.getDate() + (nuevoPlan.dias || 30));
-			  } else {
-				// Si no hay fecha de vencimiento previa, calcular una nueva fecha de vencimiento basada en la fecha de ingreso
-				clienteAnterior.fechaVencimiento = new Date(clienteAnterior.fechaIngreso);
-				clienteAnterior.fechaVencimiento.setDate(clienteAnterior.fechaVencimiento.getDate() + (nuevoPlan.dias || 30) - 1);
-			  }
-			  clienteAnterior.plan = nuevoPlanId; // Actualizar el plan del cliente
-			  await clienteAnterior.save();
-			} else {
-			  // Si el cliente cambia, restar los días del plan anterior al cliente anterior
-			  if (clienteAnterior.fechaVencimiento && planAnteriorId) {
-				const planAnterior = await Plane.findById(planAnteriorId).exec();
-				if (planAnterior) {
-				  clienteAnterior.fechaVencimiento.setDate(clienteAnterior.fechaVencimiento.getDate() - (planAnterior.dias || 30));
-				  await clienteAnterior.save();
-				}
-			  }
-	  
-			  // Asignar el nuevo plan y calcular la nueva fecha de vencimiento para el nuevo cliente
-			  nuevoCliente.plan = nuevoPlanId;
-			  if (nuevoCliente.fechaVencimiento) {
-				nuevoCliente.fechaVencimiento.setDate(nuevoCliente.fechaVencimiento.getDate() + (nuevoPlan.dias || 30));
-			  } else {
-				nuevoCliente.fechaVencimiento = new Date(nuevoCliente.fechaIngreso);
-				nuevoCliente.fechaVencimiento.setDate(nuevoCliente.fechaVencimiento.getDate() + (nuevoPlan.dias || 30) - 1);
-			  }
-			  await nuevoCliente.save();
-			}
-	  
-			// Actualizar el cliente en el pago
-			pago.cliente = nuevoClienteId;
-			await pago.save();
+		  // Sumar los días del nuevo plan a la fecha de vencimiento del cliente
+		  if (cliente.fechaVencimiento) {
+			cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + (nuevoPlan.dias || 30));
+		  } else {
+			// Si no hay fecha de vencimiento previa, calcularla basada en la fecha de ingreso
+			cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
+			cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + (nuevoPlan.dias || 30) - 1);
 		  }
+	  
+		  // Actualizar el plan del cliente al nuevo plan
+		  cliente.plan = nuevoPlanId;
+	  
+		  // Guardar los cambios en el cliente
+		  await cliente.save();
+	  
+		  // Actualizar el cliente y el plan en el pago
+		  pago.cliente = nuevoClienteId;
+		  await pago.save();
 		} catch (error) {
 		  throw new Error(error.message);
 		}
-	  }	  
+	  }	   
 };
 
 export default helpersPagos;
