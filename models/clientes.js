@@ -90,30 +90,43 @@ clienteSchema.pre('save', async function (next) {
         }
 
         // Verificar si el cliente ya tiene pagos registrados
-        const Pago = mongoose.model('Pago');
+        const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
         const pagosCliente = await Pago.find({ cliente: this._id }).exec();
+
+        // Log para depuración
+        console.log('Pagos Cliente:', pagosCliente);
 
         // Calcular fecha de vencimiento solo si no hay pagos registrados
         if (pagosCliente.length === 0) {
+            console.log('Calculando fecha de vencimiento, no hay pagos registrados.');
+            
             if (this.fechaIngreso && this.plan) {
-                const Plan = mongoose.model('Plane');
+                // Buscar el plan en la base de datos
+                const Plan = mongoose.model('Plane'); // Asume que el modelo del plan se llama 'Plane'
                 const plan = await Plan.findById(this.plan).exec();
 
+                console.log('Plan:', plan);
+
                 if (plan && plan.dias) {
+                    // Calcular fecha de vencimiento
                     this.fechaVencimiento = new Date(this.fechaIngreso);
                     this.fechaVencimiento.setDate((this.fechaVencimiento.getDate() - 1) + plan.dias);
+                    
+                    console.log('Fecha de Vencimiento Calculada:', this.fechaVencimiento);
                 }
+            } else {
+                console.log('No se pudo calcular la fecha de vencimiento: falta fecha de ingreso o plan.');
             }
         } else {
-            // Si hay pagos, mantener la fecha de vencimiento actual
-            this.fechaVencimiento = this.fechaVencimiento;
+            console.log('El cliente tiene pagos registrados, manteniendo la fecha de vencimiento actual.');
         }
 
         next();
     } catch (error) {
-        next(error);
+        next(error); // Pasa el error al middleware de manejo de errores
     }
 });
+
 
 // Método para calcular el IMC y estadoIMC
 clienteSchema.methods.calcularIMC = function () {
