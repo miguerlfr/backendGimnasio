@@ -93,26 +93,21 @@ clienteSchema.pre('save', async function (next) {
         const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
         const pagosCliente = await Pago.find({ cliente: this._id }).exec();
 
-        // Log para depuración
-        console.log('Pagos Cliente:', pagosCliente);
-
         // Calcular fecha de vencimiento solo si no hay pagos registrados
         if (pagosCliente.length === 0) {
-            console.log('Calculando fecha de vencimiento, no hay pagos registrados.');
-            
             if (this.fechaIngreso && this.plan) {
                 // Buscar el plan en la base de datos
                 const Plan = mongoose.model('Plane'); // Asume que el modelo del plan se llama 'Plane'
                 const plan = await Plan.findById(this.plan).exec();
 
-                console.log('Plan:', plan);
-
                 if (plan && plan.dias) {
-                    // Calcular fecha de vencimiento
+                    // Calcular fecha de vencimiento sumando los días del plan a la fecha de ingreso
                     this.fechaVencimiento = new Date(this.fechaIngreso);
-                    this.fechaVencimiento.setDate((this.fechaVencimiento.getDate() - 1) + plan.dias);
-                    
+                    this.fechaVencimiento.setDate(this.fechaVencimiento.getDate() + plan.dias);
+
                     console.log('Fecha de Vencimiento Calculada:', this.fechaVencimiento);
+                } else {
+                    console.log('El plan no tiene un campo "dias" válido.');
                 }
             } else {
                 console.log('No se pudo calcular la fecha de vencimiento: falta fecha de ingreso o plan.');
