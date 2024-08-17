@@ -46,7 +46,7 @@ const httpProductos = {
 	},
 	putProductos: async (req, res) => {
 		const { id } = req.params;
-		const { codigo, descripcion, valor, cantidad } = req.body;
+		const { codigo, proveedor, descripcion, valor, cantidad } = req.body;
 	
 		try {
 			// Crear objeto de actualización solo con los campos proporcionados y limpiados

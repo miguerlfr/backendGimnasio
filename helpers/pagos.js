@@ -97,21 +97,21 @@ const helpersPagos = {
 				}
 	
 				// Sumar los días del plan a la fecha de vencimiento del cliente
-				// if (cliente.fechaVencimiento) {
-				// 	const nuevaFechaVencimiento = new Date(cliente.fechaVencimiento);
-				// 	nuevaFechaVencimiento.setDate(nuevaFechaVencimiento.getDate() + diasPlan);
-				// 	cliente.fechaVencimiento = nuevaFechaVencimiento;
-				// } else if (cliente.fechaIngreso) {
-				// 	cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
-				// 	if (plan.dias >= 365) {
-				// 		// Si el plan es de un año o más, establecer la fecha de vencimiento al final del año
-				// 		cliente.fechaVencimiento.setFullYear(cliente.fechaIngreso.getFullYear() + 1);
-				// 		cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() - 1); // El último día del año
-				// 	} else {
-				// 		// Para otros planes, añade los días
-				// 		cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + diasPlan - 1);
-				// 	}
-				// }
+				if (cliente.fechaVencimiento) {
+					const nuevaFechaVencimiento = new Date(cliente.fechaVencimiento);
+					nuevaFechaVencimiento.setDate(nuevaFechaVencimiento.getDate() + diasPlan);
+					cliente.fechaVencimiento = nuevaFechaVencimiento;
+				} else if (cliente.fechaIngreso) {
+					cliente.fechaVencimiento = new Date(cliente.fechaIngreso);
+					if (plan.dias >= 365) {
+						// Si el plan es de un año o más, establecer la fecha de vencimiento al final del año
+						cliente.fechaVencimiento.setFullYear(cliente.fechaIngreso.getFullYear() + 1);
+						cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() - 1); // El último día del año
+					} else {
+						// Para otros planes, añade los días
+						cliente.fechaVencimiento.setDate(cliente.fechaVencimiento.getDate() + diasPlan - 1);
+					}
+				}
 			}
 	
 			// Guardar los cambios en el cliente
@@ -122,7 +122,7 @@ const helpersPagos = {
 			console.error("Error en postPlanQ:", error);
 			throw new Error(`No se pudo procesar el plan: ${error.message}`);
 		}
-	},	
+	},
 	putPlan: async (pagoId, nuevoClienteId, nuevoPlanId) => {
 		try {
 		  const pago = await Pago.findById(pagoId).populate('cliente').exec();

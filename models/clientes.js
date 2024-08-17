@@ -62,20 +62,18 @@ clienteSchema.pre('save', async function (next) {
 
                     // Si el plan es de un año (365 días o más), establecer la fecha de vencimiento al final del año
                     if (plan.dias >= 365) {
-                        const fechaIngreso = new Date(this.fechaIngreso);
-                        this.fechaVencimiento = new Date(fechaIngreso.getFullYear(), 11, 31); // 31 de diciembre del año de ingreso
+                        this.fechaVencimiento = new Date(this.fechaIngreso);
+                        this.fechaVencimiento.setFullYear(this.fechaIngreso.getFullYear() + 1);
+                        this.fechaVencimiento.setDate(this.fechaVencimiento.getDate() - 1); // El último día del año
                     } else {
                         // Para otros planes, simplemente añade los días
                         this.fechaVencimiento.setDate(this.fechaVencimiento.getDate() + plan.dias - 1);
                     }
                 }
             } else {
-                // Si el cliente ya tiene pagos registrados, actualiza la fecha de vencimiento
-                if (this.fechaVencimiento) {
-                    // Asegúrate de que `this.fechaVencimiento` esté definida
-                    const fechaVencimiento = new Date(this.fechaVencimiento);
-                    fechaVencimiento.setDate(fechaVencimiento.getDate() + plan.dias);
-                    this.fechaVencimiento = fechaVencimiento;
+                // Si el cliente tiene más de un pago registrado, solo actualiza el plan si es diferente del actual
+                if (this.plan.toString() !== plan._id.toString()) {
+                    this.plan = plan._id;
                 }
             }
         }
