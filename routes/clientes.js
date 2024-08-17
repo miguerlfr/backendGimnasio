@@ -16,7 +16,6 @@ router.get("/",
     validarJWT
   ],
   httpClientes.getClientes
-
 );
 
 router.get('/activos',
