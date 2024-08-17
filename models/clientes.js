@@ -55,7 +55,7 @@ clienteSchema.pre('save', async function (next) {
             if (plan && plan.dias) {
                 // Calcular fecha de vencimiento
                 this.fechaVencimiento = new Date(this.fechaIngreso);
-                this.fechaVencimiento.setDate(this.fechaVencimiento.getDate() + plan.dias);
+                this.fechaVencimiento.setDate((this.fechaVencimiento.getDate() - 1) + plan.dias);
             }
         }
 
