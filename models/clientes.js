@@ -101,13 +101,13 @@ clienteSchema.pre('save', async function (next) {
                 const plan = await Plan.findById(this.plan).exec();
 
                 if (plan && plan.dias) {
-                    // Calcular fecha de vencimiento sumando los días del plan a la fecha de ingreso
+                    // Sumar los días del plan a la fecha de ingreso
                     this.fechaVencimiento = new Date(this.fechaIngreso);
                     this.fechaVencimiento.setDate(this.fechaVencimiento.getDate() + plan.dias);
 
                     console.log('Fecha de Vencimiento Calculada:', this.fechaVencimiento);
                 } else {
-                    console.log('El plan no tiene un campo "dias" válido.');
+                    console.log('No se encontró el plan asociado o el plan no tiene días especificados.');
                 }
             } else {
                 console.log('No se pudo calcular la fecha de vencimiento: falta fecha de ingreso o plan.');
@@ -121,7 +121,6 @@ clienteSchema.pre('save', async function (next) {
         next(error); // Pasa el error al middleware de manejo de errores
     }
 });
-
 
 // Método para calcular el IMC y estadoIMC
 clienteSchema.methods.calcularIMC = function () {
