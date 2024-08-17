@@ -147,10 +147,29 @@ const httpClientes = {
 			}
 	
 			// Actualizar el cliente
-			const clienteActualizado = await Cliente.findByIdAndUpdate(id, camposActualizables, { new: true });
+			const clienteActualizado = await Cliente.findById(id);
 	
 			if (!clienteActualizado) {
 				return res.status(404).json({ error: "ID del Cliente no encontrado" });
+			}
+	
+			// Actualizar los campos del cliente
+			Object.assign(clienteActualizado, camposActualizables);
+	
+			// Calcular la fecha de vencimiento solo si no hay pagos registrados
+			const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
+			const pagosCliente = await Pago.find({ cliente: id }).exec();
+	
+			if (pagosCliente.length === 0 && clienteActualizado.fechaIngreso && clienteActualizado.plan) {
+				// Buscar el plan en la base de datos
+				const Plan = mongoose.model('Plane'); // Asume que el modelo del plan se llama 'Plane'
+				const plan = await Plan.findById(clienteActualizado.plan).exec();
+	
+				if (plan && plan.dias) {
+					// Calcular fecha de vencimiento
+					clienteActualizado.fechaVencimiento = new Date(clienteActualizado.fechaIngreso);
+					clienteActualizado.fechaVencimiento.setDate(clienteActualizado.fechaVencimiento.getDate() + plan.dias);
+				}
 			}
 	
 			// Calcular IMC después de la actualización
@@ -161,9 +180,9 @@ const httpClientes = {
 		} catch (error) {
 			// Manejar errores
 			console.log("error:", error);
-			res.status(400).json({ error: `No se pudo editar el cliente ${error.message}` });
+			res.status(400).json({ error: `No se pudo editar el cliente: ${error.message}` });
 		}
-	},	
+	},		
 	putClientesActivar: async (req, res) => {
 		const { id } = req.params;
 		const clientes = await Cliente.findByIdAndUpdate(id, { estado: 1 }, { new: true });
