@@ -4,7 +4,7 @@ import { PlanClientePorTerminar, PlanClienteTerminado } from "../middlewares/ema
 import moment from 'moment-timezone';
 
 // Definición del cron job para que se ejecute todos los días a las 5:30 AM
-const cronJobRecordatorio = cron.schedule('56 18 * * *', async () => {
+const cronJobRecordatorio = cron.schedule('10 18 * * *', async () => {
   const now = moment().tz('America/Bogota');  // Configura la zona horaria
   const fechaComparacion = now.clone().add(6, 'days'); // Sumar 7 días a la fecha actual
 
@@ -52,7 +52,7 @@ const cronJobRecordatorio = cron.schedule('56 18 * * *', async () => {
 
 
 // Definición del cron job para que se ejecute todos los días a las 9:00 PM
-const cronJob = cron.schedule('17 19 * * *', async () => {
+const cronJob = cron.schedule('10 19 * * *', async () => {
   const now = new Date();
   const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfDay = new Date(localDate.getTime());
