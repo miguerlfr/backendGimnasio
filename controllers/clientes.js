@@ -114,12 +114,23 @@ const httpClientes = {
 			let { nombre, fechaIngreso, documento, fechaNacimiento, direccion, email, objetivo, observaciones, plan, seguimiento } = req.body;
 	
 			// Verificar si el plan se proporcionó y si existe
+			let planData;
 			if (plan) {
-				const planData = await Plane.findById(plan);
+				planData = await Plane.findById(plan);
 				if (!planData) {
 					throw new Error("Plan no encontrado");
 				}
 			}
+	
+			// Obtener el cliente actual
+			const clienteActual = await Cliente.findById(id);
+	
+			if (!clienteActual) {
+				return res.status(404).json({ error: "ID del Cliente no encontrado" });
+			}
+	
+			// Verificar si el plan ha cambiado
+			const planChanged = plan && (clienteActual.plan.toString() !== plan);
 	
 			// Campos actualizables del cliente
 			const camposActualizables = {
@@ -147,42 +158,38 @@ const httpClientes = {
 			}
 	
 			// Actualizar el cliente
-			const clienteActualizado = await Cliente.findById(id);
+			Object.assign(clienteActual, camposActualizables);
 	
-			if (!clienteActualizado) {
-				return res.status(404).json({ error: "ID del Cliente no encontrado" });
-			}
-	
-			// Actualizar los campos del cliente
-			Object.assign(clienteActualizado, camposActualizables);
-	
-			// Calcular la fecha de vencimiento solo si no hay pagos registrados
+			// Calcular la fecha de vencimiento solo si no hay pagos registrados o si el plan ha cambiado
 			const Pago = mongoose.model('Pago'); // Asume que el modelo de pago se llama 'Pago'
 			const pagosCliente = await Pago.find({ cliente: id }).exec();
 	
-			if (pagosCliente.length === 0 && clienteActualizado.fechaIngreso && clienteActualizado.plan) {
-				// Buscar el plan en la base de datos
-				const Plan = mongoose.model('Plane'); // Asume que el modelo del plan se llama 'Plane'
-				const plan = await Plan.findById(clienteActualizado.plan).exec();
+			if (pagosCliente.length === 0 || planChanged) {
+				if (clienteActual.fechaIngreso && clienteActual.plan) {
+					// Buscar el plan en la base de datos
+					if (!planData) {
+						planData = await Plane.findById(clienteActual.plan).exec();
+					}
 	
-				if (plan && plan.dias) {
-					// Calcular fecha de vencimiento
-					clienteActualizado.fechaVencimiento = new Date(clienteActualizado.fechaIngreso);
-					clienteActualizado.fechaVencimiento.setDate(clienteActualizado.fechaVencimiento.getDate() + plan.dias);
+					if (planData && planData.dias) {
+						// Calcular fecha de vencimiento
+						clienteActual.fechaVencimiento = new Date(clienteActual.fechaIngreso);
+						clienteActual.fechaVencimiento.setDate(clienteActual.fechaVencimiento.getDate() + planData.dias);
+					}
 				}
 			}
 	
 			// Calcular IMC después de la actualización
-			clienteActualizado.calcularIMC();
-			await clienteActualizado.save();
+			clienteActual.calcularIMC();
+			await clienteActual.save();
 	
-			res.json(clienteActualizado);
+			res.json(clienteActual);
 		} catch (error) {
 			// Manejar errores
 			console.log("error:", error);
 			res.status(400).json({ error: `No se pudo editar el cliente: ${error.message}` });
 		}
-	},		
+	},			
 	putClientesActivar: async (req, res) => {
 		const { id } = req.params;
 		const clientes = await Cliente.findByIdAndUpdate(id, { estado: 1 }, { new: true });
