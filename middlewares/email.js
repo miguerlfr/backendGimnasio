@@ -16,7 +16,7 @@ export const enviarEmailRecuperacion = async (email, token) => {
 		from: "luismiguelvargasjaimes@gmail.com",
 		to: email,
 		subject: "Recuperación de contraseña",
-		text: `Utiliza el siguiente enlace para restablecer tu contraseña: \nhttp://localhost:5173/#/restablecer-contrasena?tokenP=${token}`,
+		text: `Utiliza el siguiente enlace para restablecer tu contraseña: \nhttps://frontend-gimnasio.vercel.app/#/restablecer-contrasena?tokenP=${token}`,
 	};
 
 	try {
@@ -24,8 +24,9 @@ export const enviarEmailRecuperacion = async (email, token) => {
 		console.log("Correo de recuperación enviado exitosamente");
 	} catch (error) {
 		console.error("Error al enviar el correo de recuperación:", error);
-		throw error;
+		throw new Error('Error al enviar el correo de recuperación: ' + error.message);
 	}
+	
 };
 
 export const PlanClientePorTerminar = async (email, nombre, fechaVencimiento) => {
